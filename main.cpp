@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 
 	in.seekg( 0, in.end );
 	int32_t actualLength = in.tellg( ) / sizeof( Complex16 );
-	std::cout << "inTellg " << in.tellg()  << " and " << sizeof(Complex16 ) << std::endl;
 
 	in.seekg( 0, in.beg );
 
@@ -40,13 +39,14 @@ int main(int argc, char *argv[])
 	const float corrThreshold = 0.5;
 	const uint32_t searchDepth = 5;
 	const uint32_t decimFactor = 16;
+	const uint32_t numChannels = 1;
 
 
 	correlator->SetThreshold( corrThreshold );
 	correlator->ConfigureSearchParams( searchDepth, decimFactor );
 
 	std::cout << "Start sync " << std::endl;
-	bool res = correlator->Process( corrData.data(), 1);
+	bool res = correlator->Process( corrData.data(), numChannels);
 
 
 }
