@@ -85,8 +85,8 @@ private:
 	std::array< std::array< std::vector< ComplexFloat >, SSS_COUNT >, PSS_COUNT> sss0;
 	std::array< std::array< std::vector< ComplexFloat >, SSS_COUNT >, PSS_COUNT> sss1;
 
-	std::array<std::array<float, PSS_COUNT>, SSS_COUNT>	amp0;
-	std::array<std::array<float, PSS_COUNT>, SSS_COUNT> amp1;
+	std::array<std::array<float, SSS_COUNT>, PSS_COUNT>	amp0;
+	std::array<std::array<float, SSS_COUNT>, PSS_COUNT> amp1;
 
 	std::vector< int32_t >		m0Val;
 	std::vector< int32_t >		m1Val;
