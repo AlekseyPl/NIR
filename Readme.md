@@ -8,8 +8,8 @@ https://www.qt.io/download - Downloads for open source users
 
 3) Сборку производить в Debug. 
 В качестве kit сборки выбирать стандартный Qt.
+Во вкладке Projects:
+Build directory — указывать путь в Install/Build/;
+Build steps — выбирать --target install;
 
-Примерный вид(обратить внимание на Build Directory и Build Steps)
-
- 
  
