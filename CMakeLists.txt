@@ -33,11 +33,8 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
 	${EXTRA_LIBS}
-	pthread
-	rt
 	)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".exe")
 
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_link_target)
 
