@@ -1,11 +1,11 @@
 #ifndef INCLUDE_LTE_SOFTTURBODECODER_H_
 #define INCLUDE_LTE_SOFTTURBODECODER_H_
 
-#include "Lte/Core/Common/LteConst.h"
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/LteSupport.h"
-#include "Lte/Core/Common/Crc.h"
-#include "Lte/Core/Common/TurboCodeSupport.h"
+#include "Common/LteConst.h"
+#include "Common/LteTypes.h"
+#include "Common/LteSupport.h"
+#include "Common/Crc.h"
+#include "Common/TurboCodeSupport.h"
 
 #include <vector>
 #include <array>

@@ -8,7 +8,7 @@
 #ifndef LTE_TURBOCODE_SUPPORT_H_
 #define LTE_TURBOCODE_SUPPORT_H_
 
-#include "Lte/Core/Common/LteSupport.h"
+#include "Common/LteSupport.h"
 
 namespace Lte {
 // TS 36.212 5.1.3.2.3 Turbo code internal interleaver.

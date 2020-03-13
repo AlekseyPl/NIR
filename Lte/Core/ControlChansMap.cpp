@@ -5,11 +5,9 @@
  *      Author: dblagov
  */
 
-#include "Lte/Core/ControlChansMap.h"
-#include "Lte/Core/Common/LteTypes.h"
+#include "ControlChansMap.h"
+#include "Common/LteTypes.h"
 #include <math.h>
-#include <Common/assert.h>
-#include <Common/Allocator.h>
 #include <algorithm>
 #include <System/DebugInfo.h>
 

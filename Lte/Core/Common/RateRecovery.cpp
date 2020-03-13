@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include "Lte/Core/Common/RateRecovery.h"
-#include <IntMath/Util.h>
+#include "Common/RateRecovery.h"
 #include <Math/Util.h>
 #include <Math/ComplexMath.h>
 #include <System/DebugInfo.h>

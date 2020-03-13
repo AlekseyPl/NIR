@@ -6,7 +6,7 @@
 #ifndef LTE_VRB_MAP_H
 #define LTE_VRB_MAP_H
 
-#include "Lte/Core/Common/LteTypes.h"
+#include "Common/LteTypes.h"
 
 namespace Lte {
 

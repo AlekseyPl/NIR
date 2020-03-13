@@ -1,5 +1,5 @@
 
-#include "Lte/Core/Common/PnSequence.h"
+#include "Common/PnSequence.h"
 
 namespace Lte {
 

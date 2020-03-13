@@ -8,19 +8,19 @@
 #ifndef LTE_STREAM_H_
 #define LTE_STREAM_H_
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/TranspBlock.h"
-#include "Lte/Core/Common/PbchIndex.h"
-#include "Lte/Core/Common/PcfichIndex.h"
-#include "Lte/Core/Common/CellInfo.h"
-#include "Lte/Core/Common/PbchSymbStore.h"
+#include "Common/LteTypes.h"
+#include "Common/TranspBlock.h"
+#include "Common/PbchIndex.h"
+#include "Common/PcfichIndex.h"
+#include "Common/CellInfo.h"
+#include "Common/PbchSymbStore.h"
 
-#include "Lte/Core/PcfichProcessing.h"
-#include "Lte/Core/PdcchProcessing.h"
-#include "Lte/Core/ControlChansMap.h"
+#include "PcfichProcessing.h"
+#include "PdcchProcessing.h"
+#include "ControlChansMap.h"
 
-#include "Lte/Core/Estimator.h"
-#include "Lte/Core/Equalizer.h"
+#include "Estimator.h"
+#include "Equalizer.h"
 
 #include <vector>
 #include <memory>

@@ -2,7 +2,7 @@
 #ifndef LTE_PCFICH_H
 #define LTE_PCFICH_H
 
-#include "Lte/Core/Common/LteDemConst.h"
+#include "Common/LteDemConst.h"
 #include <array>
 
 namespace Lte {

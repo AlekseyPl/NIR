@@ -6,8 +6,8 @@
 #ifndef LTE_TRANSP_BLOCK_H
 #define LTE_TRANSP_BLOCK_H
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/DciSupport.h"
+#include "Common/LteTypes.h"
+#include "Common/DciSupport.h"
 #include <vector>
 #include <string.h>
 

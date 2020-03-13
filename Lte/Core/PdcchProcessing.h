@@ -4,9 +4,9 @@
 #include <queue>
 #include <string.h>
 #include <memory>
-#include "Lte/Core/Common/Quadruplet.h"
-#include "Lte/Core/Common/DciSupport.h"
-#include "Lte/Core/Common/Deinterleaver.h"
+#include "Common/Quadruplet.h"
+#include "Common/DciSupport.h"
+#include "Common/Deinterleaver.h"
 
 namespace Lte {
 

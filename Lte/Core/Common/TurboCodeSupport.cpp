@@ -5,7 +5,7 @@
  *      Author: aplotnikov
  */
 #include <math.h>
-#include "Lte/Core/Common/TurboCodeSupport.h"
+#include "Common/TurboCodeSupport.h"
 
 using namespace std;
 

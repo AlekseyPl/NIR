@@ -7,7 +7,7 @@
 #ifndef LTE_CRC_H
 #define LTE_CRC_H
 
-#include "Lte/Core/Common/LteTypes.h"
+#include "Common/LteTypes.h"
 #include <string.h>
 
 namespace Lte

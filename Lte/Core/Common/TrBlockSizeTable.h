@@ -8,8 +8,8 @@
 #ifndef LTE_TR_BLOCK_SIZE_TABLE_H_
 #define LTE_TR_BLOCK_SIZE_TABLE_H_
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/LteDemConst.h"
+#include "Common/LteTypes.h"
+#include "Common/LteDemConst.h"
 
 namespace Lte
 {

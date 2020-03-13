@@ -27,12 +27,20 @@ RefSymbPos::RefSymbPos( uint32_t rs0_0, uint32_t rs0_1, uint32_t rs1_0, uint32_t
 
 bool RefSymbPos::IsRefSymbolPresent( uint32_t antPort, uint32_t symb )
 {
-  bool p;
+  bool p = false;
   switch ( antPort ) {
-    case 0: p = (m_RS0_0 == symb) || (m_RS0_1 == symb); break;
-    case 1: p = (m_RS1_0 == symb) || (m_RS1_1 == symb); break;
-    case 2: p = (m_RS2_0 == symb); break;
-    case 3: p = (m_RS3_0 == symb); break;
+    case 0:
+        p = (m_RS0_0 == symb) || (m_RS0_1 == symb);
+        break;
+    case 1:
+        p = (m_RS1_0 == symb) || (m_RS1_1 == symb);
+        break;
+    case 2:
+        p = (m_RS2_0 == symb);
+        break;
+    case 3:
+        p = (m_RS3_0 == symb);
+        break;
   }
 
   return p;

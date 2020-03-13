@@ -2,7 +2,7 @@
 #ifndef LTE_PNSEQUENCE_H
 #define LTE_PNSEQUENCE_H
 
-#include "Lte/Core/Common/LteTypes.h"
+#include "Common/LteTypes.h"
 
 namespace Lte
 {

@@ -5,11 +5,11 @@
  *      Author: dblagov
  */
 
-#include "Lte/Core/Common/PbchIndex.h"
-#include "Lte/Core/Common/LteSupport.h"
-#include "Lte/Core/Common/LteDemConst.h"
-#include "Lte/Core/Common/RsShift.h"
-#include "Lte/Core/Common/CellInfo.h"
+#include "Common/PbchIndex.h"
+#include "Common/LteSupport.h"
+#include "Common/LteDemConst.h"
+#include "Common/RsShift.h"
+#include "Common/CellInfo.h"
 
 namespace Lte {
 

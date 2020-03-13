@@ -1,7 +1,7 @@
-#include "Lte/Core/PbchProcessing.h"
-#include "Lte/Core/Decoder.h"
-#include "Lte/Core/Common/PnSequence.h"
-#include "Lte/Core/Common/CellInfo.h"
+#include "PbchProcessing.h"
+#include "Decoder.h"
+#include "Common/PnSequence.h"
+#include "Common/CellInfo.h"
 
 using namespace std;
 

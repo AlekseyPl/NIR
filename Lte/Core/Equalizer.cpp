@@ -5,9 +5,8 @@
  *      Author: dblagov
  */
 
-#include "Lte/Core/Equalizer.h"
-#include "Lte/Core/Common/LteSupport.h"
-#include "IntMath/Util.h"
+#include "Equalizer.h"
+#include "Common/LteSupport.h"
 #include <string.h>
 #include <algorithm>
 #include <System/DebugInfo.h>

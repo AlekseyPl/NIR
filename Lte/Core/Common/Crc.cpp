@@ -4,9 +4,9 @@
  *  @date   12/03/2012
  *  @brief  ������� ���������� CRC �������� 3GPP TS 36.212.
  */
-#include "Lte/Core/Common/LteSupport.h"
-#include "Lte/Core/Common/LteConst.h"
-#include "Lte/Core/Common/Crc.h"
+#include "Common/LteSupport.h"
+#include "Common/LteConst.h"
+#include "Common/Crc.h"
 #include "System/DebugInfo.h"
 
 namespace Lte

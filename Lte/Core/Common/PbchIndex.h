@@ -8,7 +8,7 @@
 #ifndef LTE_PBCH_INDEX_H_
 #define LTE_PBCH_INDEX_H_
 
-#include "Lte/Core/Common/LteTypes.h"
+#include "Common/LteTypes.h"
 
 namespace Lte {
 

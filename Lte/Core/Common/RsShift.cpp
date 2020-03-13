@@ -5,8 +5,8 @@
  *      Author: dblagov
  */
 
-#include "Lte/Core/Common/RsShift.h"
-#include "Lte/Core/Common/CellInfo.h"
+#include "Common/RsShift.h"
+#include "Common/CellInfo.h"
 #include <algorithm>
 
 namespace Lte {

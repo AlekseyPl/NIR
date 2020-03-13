@@ -6,7 +6,7 @@
 #ifndef LTE_RIV_H
 #define LTE_RIV_H
 
-#include "Lte/Core/Common/LteTypes.h"
+#include "Common/LteTypes.h"
 
 namespace Lte {
 

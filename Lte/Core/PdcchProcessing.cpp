@@ -1,7 +1,7 @@
-#include "Lte/Core/PdcchProcessing.h"
-#include "Lte/Core/Common/CellInfo.h"
-#include "Lte/Core/Common/PnSequence.h"
-#include "Lte/Core/Decoder.h"
+#include "PdcchProcessing.h"
+#include "Common/CellInfo.h"
+#include "Common/PnSequence.h"
+#include "Decoder.h"
 #include <algorithm>
 #include <System/DebugInfo.h>
 

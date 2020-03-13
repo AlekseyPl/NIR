@@ -8,7 +8,7 @@
 #ifndef INCLUDE_LTE_COMMON_RATERECOVERY_H_
 #define INCLUDE_LTE_COMMON_RATERECOVERY_H_
 
-#include "Lte/Core/Common/Deinterleaver.h"
+#include "Common/Deinterleaver.h"
 #include <vector>
 
 namespace System {

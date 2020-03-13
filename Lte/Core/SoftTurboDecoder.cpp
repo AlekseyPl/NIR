@@ -1,4 +1,4 @@
-#include "Lte/Core/SoftTurboDecoder.h"
+#include "SoftTurboDecoder.h"
 
 #include <Math/ComplexMath.h>
 #include <System/DebugInfo.h>

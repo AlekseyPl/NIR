@@ -8,8 +8,8 @@
 #ifndef LTE_PCFICH_INDEX_H_
 #define LTE_PCFICH_INDEX_H_
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/CellInfo.h"
+#include "Common/LteTypes.h"
+#include "Common/CellInfo.h"
 
 namespace Lte {
 

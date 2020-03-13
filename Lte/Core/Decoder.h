@@ -8,9 +8,9 @@
 #ifndef LTE_DECODER_H_
 #define LTE_DECODER_H_
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/TranspBlock.h"
-#include "Lte/Core/Common/Crc.h"
+#include "Common/LteTypes.h"
+#include "Common/TranspBlock.h"
+#include "Common/Crc.h"
 #include <string>
 #include <memory>
 

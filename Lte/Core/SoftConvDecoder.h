@@ -8,10 +8,9 @@
 #ifndef INCLUDE_LTE_SOFTCONVDECODER_H_
 #define INCLUDE_LTE_SOFTCONVDECODER_H_
 
-#include "Lte/Core/Common/LteConst.h"
-#include "Lte/Core/Common/LteTypes.h"
+#include "Common/LteConst.h"
+#include "Common/LteTypes.h"
 
-#include <Common/Buffer.h>
 
 namespace Lte {
 

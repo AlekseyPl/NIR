@@ -8,11 +8,10 @@
 #ifndef LTE_CONTROL_CHANS_MAP_H_
 #define LTE_CONTROL_CHANS_MAP_H_
 
-#include "Lte/Core/Common/CellInfo.h"
-#include "Lte/Core/Common/PcfichIndex.h"
-#include "Lte/Core/Common/Quadruplet.h"
+#include "Common/CellInfo.h"
+#include "Common/PcfichIndex.h"
+#include "Common/Quadruplet.h"
 
-#include "Common/Buffer.h"
 
 namespace Lte {
 
@@ -75,7 +74,6 @@ private:
     Quadruplets 		phichQuad;
     Quadruplets  		pdcchQuad;
     QuadrupletsCnt               pdcchQuadCnt;
-    Common::Buffer<uint32_t>    mapRegsCount[ CFI_Variants ];
     QuadrupletMaps              quadMap;
 
     uint32_t			mapSize;

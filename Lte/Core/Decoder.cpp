@@ -5,18 +5,16 @@
  *      Author: aplotnikov
  */
 
-#include "Lte/Core/Decoder.h"
-#include "Lte/Core/SoftConvDecoder.h"
-#include "Lte/Core/SoftTurboDecoder.h"
-#include "Lte/Core/Common/RateRecovery.h"
-#include "Lte/Core/Common/TurboCodeSupport.h"
-//#include "Chip/Tcp.h"
-#include <Chip/Vcp.h>
+#include "Decoder.h"
+#include "SoftConvDecoder.h"
+#include "SoftTurboDecoder.h"
+#include "Common/RateRecovery.h"
+#include "Common/TurboCodeSupport.h"
 #include <System/DebugInfo.h>
-#include <Chip/Core.h>
+//#include <Chip/Core.h>
 
 
-//#define VCP_SOFT
+#define VCP_SOFT
 #define TCP_SOFT
 
 namespace {
@@ -34,7 +32,9 @@ Decoder::Decoder(): /*tcp( NULL ), */vcp( nullptr ), frameLength( 0 ),
 	  convDec( new SoftConvDecoder()), 	turboDec( new SoftTurboDecoder()),
 	  rateRecovery( new RateRecovery( )),debug( System::DebugInfo::Locate() )
 {
+#ifndef VCP_SOFT
 	vcp = Chip::VcpFactory::Create( Constraint, Chip::Vcp::rate3, 0133, 0171, 0165, 0 );
+#endif
 #ifndef TCP_SOFT
 	tcp = Chip::TcpFactory::Create( Chip::Tcp::_3GPP, Chip::Tcp::rate1_3 );
 	MakeTurboFakeRound( );
@@ -46,7 +46,9 @@ Decoder::~Decoder( )
 #ifndef TCP_SOFT
 	Chip::TcpFactory::Release( tcp );
 #endif
+#ifndef VCP_SOFT
 	Chip::VcpFactory::Release( vcp );
+#endif
 }
 
 bool 	Decoder::TurboDecodeSCH( SoftDecision *data, CtcRmParams& rm, uint32_t fillerBits, CrcType crcType )

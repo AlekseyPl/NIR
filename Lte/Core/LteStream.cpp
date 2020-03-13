@@ -6,15 +6,15 @@
  */
 #include <algorithm>
 #include <math.h>
-#include "Lte/Core/LteStream.h"
-#include "Lte/Core/Common/LteSupport.h"
-#include "Lte/Core/Common/RsShift.h"
+#include "LteStream.h"
+#include "Common/LteSupport.h"
+#include "Common/RsShift.h"
 
-#include "Lte/Core/PbchProcessing.h"
-#include "Lte/Core/PdschProcessing.h"
-#include "Lte/Core/VrbMap.h"
-#include "Lte/Core/Riv.h"
-#include "Lte/Core/Decoder.h"
+#include "PbchProcessing.h"
+#include "PdschProcessing.h"
+#include "VrbMap.h"
+#include "Riv.h"
+#include "Decoder.h"
 
 
 #include "System/DebugInfo.h"

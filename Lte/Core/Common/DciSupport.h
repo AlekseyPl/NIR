@@ -7,7 +7,7 @@
 #ifndef LTE_DCI_SUPPORT_H
 #define LTE_DCI_SUPPORT_H
 
-#include "Lte/Core/Common/LteSupport.h"
+#include "Common/LteSupport.h"
 #include <cstring>
 
 namespace Lte

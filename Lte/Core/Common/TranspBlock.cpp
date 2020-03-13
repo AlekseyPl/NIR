@@ -3,8 +3,8 @@
  *  @author Dolgov Sergey
  *  @date   25/02/2014
  */
-#include "Lte/Core/Common/TranspBlock.h"
-#include "Lte/Core/Common/CellInfo.h"
+#include "Common/TranspBlock.h"
+#include "Common/CellInfo.h"
 
 using namespace std;
 

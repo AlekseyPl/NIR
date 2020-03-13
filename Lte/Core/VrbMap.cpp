@@ -3,8 +3,8 @@
  *  @author Dolgov Sergey
  *  @date   24/02/2014
  */
-#include "Lte/Core/VrbMap.h"
-#include "Lte/Core/Common/DciSupport.h"
+#include "VrbMap.h"
+#include "Common/DciSupport.h"
 #include <math.h>
 
 namespace Lte {

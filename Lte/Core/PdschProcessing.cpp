@@ -1,10 +1,10 @@
-#include "Lte/Core/PdschProcessing.h"
-#include "Lte/Core/Common/TrBlockSizeTable.h"
-#include "Lte/Core/Common/PnSequence.h"
-#include "Lte/Core/Common/Crc.h"
-#include "Lte/Core/Common/TurboCodeSupport.h"
-#include "Lte/Core/Common/Deinterleaver.h"
-#include "Lte/Core/Decoder.h"
+#include "PdschProcessing.h"
+#include "Common/TrBlockSizeTable.h"
+#include "Common/PnSequence.h"
+#include "Common/Crc.h"
+#include "Common/TurboCodeSupport.h"
+#include "Common/Deinterleaver.h"
+#include "Decoder.h"
 
 #include "System/DebugInfo.h"
 

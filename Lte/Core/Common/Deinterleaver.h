@@ -8,7 +8,7 @@
 #ifndef INCLUDE_LTE_DEINTERLEAVER_H_
 #define INCLUDE_LTE_DEINTERLEAVER_H_
 
-#include "Lte/Core/Common/LteSupport.h"
+#include "Common/LteSupport.h"
 #include <array>
 
 namespace Lte {

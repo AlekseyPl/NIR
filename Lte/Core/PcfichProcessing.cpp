@@ -1,5 +1,5 @@
-#include "Lte/Core/PcfichProcessing.h"
-#include "Lte/Core/Common/PnSequence.h"
+#include "PcfichProcessing.h"
+#include "Common/PnSequence.h"
 #include <cstring>
 
 using namespace std;

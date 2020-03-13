@@ -7,10 +7,10 @@
 #include <vector>
 #include <math.h>
 
-#include "Lte/Core/Common/Crc.h"
-#include "Lte/Core/Common/LteConst.h"
-#include "Lte/Core/Common/LteSupport.h"
-#include "Lte/Core/Common/DciSupport.h"
+#include "Common/Crc.h"
+#include "Common/LteConst.h"
+#include "Common/LteSupport.h"
+#include "Common/DciSupport.h"
 
 using namespace std;
 

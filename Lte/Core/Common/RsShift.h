@@ -8,8 +8,8 @@
 #ifndef LTE_RS_SHIFT_H_
 #define LTE_RS_SHIFT_H_
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/LteDemConst.h"
+#include "Common/LteTypes.h"
+#include "Common/LteDemConst.h"
 #include <vector>
 #include <array>
 

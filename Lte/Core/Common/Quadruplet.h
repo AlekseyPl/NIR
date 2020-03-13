@@ -1,9 +1,7 @@
 #ifndef LTE_QUADRUPLET_H
 #define LTE_QUADRUPLET_H
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Common/Buffer.h"
-#include "Common/Allocator.h"
+#include "Common/LteTypes.h"
 
 namespace Lte {
 

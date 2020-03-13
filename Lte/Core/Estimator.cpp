@@ -5,8 +5,8 @@
  *      Author: dblagov
  */
 
-#include "Lte/Core/Estimator.h"
-#include "Lte/Core/Common/LteSupport.h"
+#include "Estimator.h"
+#include "Common/LteSupport.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>

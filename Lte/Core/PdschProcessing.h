@@ -1,8 +1,8 @@
 #ifndef LTE_PDSCH_H
 #define LTE_PDSCH_H
 
-#include "Lte/Core/Common/LteSupport.h"
-#include "Lte/Core/Common/TranspBlock.h"
+#include "Common/LteSupport.h"
+#include "Common/TranspBlock.h"
 #include <memory>
 
 namespace System {

@@ -4,9 +4,9 @@
  *  Created on: 09.07.2014
  *      Author: dblagov
  */
-#include "Lte/Core/Common/PcfichIndex.h"
-#include "Lte/Core/Common/LteDemConst.h"
-#include "Lte/Core/Common/RsShift.h"
+#include "Common/PcfichIndex.h"
+#include "Common/LteDemConst.h"
+#include "Common/RsShift.h"
 
 
 namespace Lte {

@@ -8,8 +8,8 @@
 #ifndef LTE_EQUALIZER_H_
 #define LTE_EQUALIZER_H_
 
-#include "Lte/Core/Common/LteTypes.h"
-#include "Lte/Core/Common/LteDemConst.h"
+#include "Common/LteTypes.h"
+#include "Common/LteDemConst.h"
 #include <array>
 
 namespace Lte {

@@ -5,8 +5,8 @@
  *      Author: aplotnikov
  */
 
-#include "Lte/Core/SoftConvDecoder.h"
-#include "Lte/Core/Common/LteSupport.h"
+#include "SoftConvDecoder.h"
+#include "Common/LteSupport.h"
 
 
 namespace Lte {

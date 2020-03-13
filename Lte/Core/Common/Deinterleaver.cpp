@@ -5,8 +5,8 @@
  *      Author: aplotnikov
  */
 
-#include "Lte/Core/Common/Deinterleaver.h"
-#include "Lte/Core/Common/Quadruplet.h"
+#include "Common/Deinterleaver.h"
+#include "Common/Quadruplet.h"
 
 namespace Lte {
 

@@ -3,8 +3,8 @@
  *  @author Dolgov Sergey
  *  @date   25/02/2014
  */
-#include "Lte/Core/Riv.h"
-#include "Lte/Core/Common/DciSupport.h"
+#include "Riv.h"
+#include "Common/DciSupport.h"
 
 namespace Lte {
 
