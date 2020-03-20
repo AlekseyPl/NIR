@@ -107,7 +107,7 @@ bool 	Decoder::ViterbiDecodeBCH( SoftDecision* data, uint32_t srcLen, uint32_t d
 	vcp->Decode( branchMetrics, decis );
 #else
 	rateRecovery->CcRateRecovery<int16_t>( data, srcLen, encoded16.data(), frameLength );
-	convDec->Process( encoded16.data(), hd.data(), frameLength );
+	convDec->Process( encoded16.data(), decis, frameLength );
 #endif
 
 	uint32_t rv = ExtractRvCrc(decis, dstLen, BCH_CRC_Size);
