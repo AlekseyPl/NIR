@@ -18,7 +18,8 @@
 
 
 #include "System/DebugInfo.h"
-
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 namespace Lte {
@@ -196,6 +197,12 @@ bool LteStream::PBCH_StateImpl( const Complex16* sd )
 
 		if( pbchStore.count == PBCH_SymbolsPerRadioFrame ) {
 			debug.SendText("Try to decode PBCH" );
+
+            std::ofstream output("/home/stepan/matlab_scripts/BCH_data.dat", std::ios::binary);
+            output.write(reinterpret_cast<char*>(pbchStore.symbols), pbchStore.symb_capacity * sizeof(pbchStore.symbols[0]));
+            output.close();
+            std::cout<<"1 halfCP"<<std::endl;
+            std::cout<<"=========================="<<std::endl;
 
 			for( uint32_t fr = 0; fr < PBCH_RadioFrames; ++fr ) {
 				bool ret = pbch->Process( pbchStore.symbols, pbchStore.pos, cellInfo, time, fr );

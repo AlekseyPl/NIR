@@ -92,6 +92,9 @@ int main(int argc, char *argv[])
 
 				in.read( reinterpret_cast<char*>(sfBuffer.data()), sfLength * sizeof( Complex16 ) );
 				in.seekg( 9 * Lte::LTESubframeLength * sizeof( Complex16 ), in.cur );
+                //void SetConfig (bool DoPhaseCorr, bool DoSwapCP) {this->DoPhaseCorr = DoPhaseCorr; this->DoSwapCP = DoSwapCP;};
+
+                demodulator->SetConfig(true,true);
 
 				demodulator->ProcessSubframe(sfBuffer.data(), numChannels);
 				auto& ofdmSymbols = demodulator->GetSymbols();

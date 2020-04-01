@@ -36,6 +36,7 @@ struct PbchSymbStore {
 	static const uint32_t PBCH_frameCount = 7;
 
 	Complex16		symbols[ PBCH_MaxSamplesPerRFCnt * PBCH_frameCount ];
+    int symb_capacity = PBCH_MaxSamplesPerRFCnt * PBCH_frameCount;
 	uint32_t		pos;
 	uint32_t		count;
 	uint32_t		frameCount;

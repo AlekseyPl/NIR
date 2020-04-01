@@ -19,40 +19,55 @@ namespace Lte {
 
 class LteOfdmDemod {
 public:
-	LteOfdmDemod( CyclicPrefix cp = lteCP_Short );
-	virtual ~LteOfdmDemod( );
-	CyclicPrefix GetCyclicPrefix( )
-	{
-		return cyclicPrefix;
-	}
-	std::vector< ComplexFloat >&	GetSymbols( )
-	{
-		return buffer;
-	}
+        LteOfdmDemod( CyclicPrefix cp = lteCP_Short );
+        virtual ~LteOfdmDemod( );
+        CyclicPrefix GetCyclicPrefix( )
+        {
+                return cyclicPrefix;
+        }
+        std::vector< ComplexFloat >&	GetSymbols( )
+        {
+                return buffer;
+        }
 
-	void ProcessSubframe( Complex16* data, uint32_t step );
-	void ProcessRefSymb( Complex16* data, uint32_t step );
+        void ProcessSubframe( Complex16* data, uint32_t step );
+        void ProcessRefSymb( Complex16* data, uint32_t step );
+    void PhaseCorrect (Complex16* data, uint32_t CPType, uint32_t step);
+    void ActionWithCP (uint32_t CPType);
+    void SetConfig (bool DoPhaseCorr, bool DoSwapCP) {
+        this->DoPhaseCorr = DoPhaseCorr; this->DoSwapCP = DoSwapCP;};
 private:
 
-	const float			maxValue;
+        const float			maxValue;
 
-	CyclicPrefix cyclicPrefix;
+        CyclicPrefix cyclicPrefix;
 
-	uint32_t symbolCount;
-	uint32_t sfSymbolCount;
-	uint32_t refSymbPosition[ 2 ];
+        uint32_t symbolCount;
+        uint32_t sfSymbolCount;
+        uint32_t refSymbPosition[ 2 ];
 
-	std::vector<ComplexFloat>       buffer;
+        std::vector<ComplexFloat>       buffer;
 
-	Math::FftSP			fft;
-	std::vector<ComplexFloat>	infftData;
-	std::vector<ComplexFloat>	outfftData;
-	bool				startSymbol;
+        Math::FftSP			fft;
+        std::vector<ComplexFloat>	infftData;
+        std::vector<ComplexFloat>	outfftData;
 
-	System::DebugInfo&		debug;
+    std::vector <std::vector <ComplexFloat> >	CPbuf{2};
 
-	void Normalize();
-	bool IsRefSymb(uint32_t sym);
+    ComplexFloat accum;
+    ComplexFloat correct_multip;
+    float32 est;
+
+
+
+        bool				startSymbol;
+    bool DoPhaseCorr = false;
+    bool DoSwapCP = false;
+
+        System::DebugInfo&		debug;
+
+        void Normalize();
+        bool IsRefSymb(uint32_t sym);
 };
 
 }
