@@ -226,7 +226,7 @@ void LteOfdmDemod::ActionWithCP(uint32_t CPType)
 {
     if ((DoSwapCP&&DoPhaseCorr)||(DoSwapCP&&!DoPhaseCorr))
     {
-        std::copy      (infftData.begin(), infftData.begin() +  CPType/2, back_inserter(infftData));
+        std::copy      (infftData.begin(), infftData.begin() +  CPType/2, (infftData.begin()+LTEFFTLen_20_MHz));
         infftData.erase(infftData.begin(), infftData.begin() +  CPType/2);
     }
     else if ((!DoSwapCP&&DoPhaseCorr)||(!DoSwapCP&&!DoPhaseCorr))
