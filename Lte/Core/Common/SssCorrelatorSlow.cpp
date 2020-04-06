@@ -19,7 +19,7 @@ SssCorrelator::~SssCorrelator()
 
 }
 
-SssCorrelator::SearchResult SssCorrelator::Do(const ComplexFloat *data, uint32_t nid2, uint32_t pssPos)
+SssCorrelator::SearchResult SssCorrelator::Do(const ComplexFloat *data, uint32_t nid2, uint32_t pssPos)//поиск результата
 {
 	uint32_t resNid1 = 0;
 	uint32_t offset = 0;
@@ -170,8 +170,7 @@ uint32_t SssCorrelator::GetPssOffsetFrame(CyclicPrefix cp, Duplex dx)
 	else {
 		offset = (cp == lteCP_Short) ? LTEPssShiftTddS : LTEPssShiftTddL;
 	}
-	return offset;
-}
+	return offset;}
 
 
 }

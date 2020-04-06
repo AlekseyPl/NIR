@@ -11,9 +11,9 @@ set(SOURCES
 		./Common/RateRecovery.cpp
 		./Common/RsShift.cpp
 		./Common/TranspBlock.cpp
-		./Common/TurboCodeSupport.cpp
-#	    ./Common/SssCorrelator.cpp
-		./Common/SssCorrelatorSlow.cpp
+                ./Common/TurboCodeSupport.cpp
+                ./Common/SssCorrelator.cpp
+               # ./Common/SssCorrelatorSlow.cpp
 		./Common/LteSupport.cpp
 		./Common/LteTypes.cpp
 		./Common/PssCorrelator.cpp
@@ -56,8 +56,8 @@ set(SOURCES
 		./Common/TrBlockSizeTable.h
 		./Common/TranspBlock.h
 		./Common/TurboCodeSupport.h
-		./Common/SssCorrelatorSlow.h
-#	    ./Common/SssCorrelator.h
+               # ./Common/SssCorrelatorSlow.h
+                ./Common/SssCorrelator.h
 		./Common/PssCorrelator.h
 		./Common/SyncCode.h
 		./Common/SyncFilter.h

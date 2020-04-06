@@ -238,7 +238,7 @@ void SecondarySyncCode::DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m0
 		c1.push_back( ct[ ( i + nid2 + 3 ) % LTESyncCodeHalfLen ]);
 
 	for( int32_t i = 0; i < LTESyncCodeHalfLen; ++i )
-		z1.push_back( zt[ ( i + ( m0 & 7 ) ) % LTESyncCodeHalfLen ] );
+        z1.push_back( zt[ ( i + ( m0 & 7 ) ) % LTESyncCodeHalfLen ] );//8???
 
 	for( int32_t i = 0; i < LTESyncCodeHalfLen; ++i )
 		signal[ i ] *= c1[ i ];
@@ -279,8 +279,10 @@ void SecondarySyncCode::GenerateSt( )
 	x[ 2 ] = 0;
 	x[ 3 ] = 0;
 	x[ 4 ] = 1;
-	for( uint32_t i = 0; i < ( LTESyncCodeHalfLen - 5 ); ++i ) x[ i + 5 ] = ( x[ i + 2 ] + x[ i ] ) & 0x01;
-	for( uint32_t i = 0; i < LTESyncCodeHalfLen; ++i ) st[ i ] = 1 - 2 * x[ i ];
+    for( uint32_t i = 0; i < ( LTESyncCodeHalfLen - 5 ); ++i )
+        x[ i + 5 ] = ( x[ i + 2 ] + x[ i ] ) & 0x01;
+    for( uint32_t i = 0; i < LTESyncCodeHalfLen; ++i )
+        st[ i ] = 1 - 2 * x[ i ];
 }
 
 void SecondarySyncCode::GenerateCt( )

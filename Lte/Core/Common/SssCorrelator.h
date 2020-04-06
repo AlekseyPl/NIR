@@ -1,10 +1,10 @@
 #ifndef SSS_CORRELATOR_H_
 #define SSS_CORRELATOR_H_
 
-#include "Lte/Core/Common/LteDemConst.h"
-#include "Lte/Core/Common/LteSupport.h"
+#include "Common/LteDemConst.h"
+#include "Common/LteSupport.h"
 #include <Math/FftSP.h>
-#include <Lte/Core/Common/SyncCode.h>
+#include <Common/SyncCode.h>
 #include <array>
 
 namespace System {
@@ -39,7 +39,7 @@ public:
 
 	void			Configure(SearchDepth s);
 	SearchResult	Do(const ComplexFloat* data, uint32_t nid2, uint32_t pssPos);
-
+    uint32_t GetPssOffsetFrame(CyclicPrefix cp, Duplex dx);
 private:
 	static const uint32_t SssFftCorrLen = 32;
 	static const uint32_t DecimFactor = 16;

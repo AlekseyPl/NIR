@@ -6,7 +6,7 @@
  */
 
 #include "LteCorrelator.h"
-#include "Common/SssCorrelatorSlow.h"
+#include "Common/SssCorrelator.h"
 #include "Common/PssCorrelator.h"
 #include "Common/SyncFilter.h"
 #include <System/DebugInfo.h>
@@ -100,6 +100,7 @@ void LteCorrelator::CalcSyncCorr( const ComplexFloat* data )
 		auto searchRes = sssCorrelator->Do(data, resNid2, pssPos);
 
 		nCellId = GetResNid(searchRes.nid1, resNid2);
+
 		framePos = pssPos*decimFactor - searchRes.shiftToFrame;
 		framePos -= searchRes.subframeNum * LTESlotsInSubframe * LTESlotLength;
 		if( framePos < 0 ) framePos += LTEFrameLength;
