@@ -6,7 +6,7 @@
 
 
 namespace Lte {
-//бпф 128 то
+//бпф 128
 SssCorrelator::SssCorrelator():
       startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen),//64 - 31 = 33
       startPos1(SyncCode::FFTLEN / 2 + 1),//
@@ -14,9 +14,8 @@ SssCorrelator::SssCorrelator():
       endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen),//128/2+31
       fft32(SssFftCorrLen/*,Common::AllocatorHeapCached::Locate()*/),
       fft128(SyncCode::FFTLEN/*, Common::AllocatorHeapCached::Locate()*/),
-      sssCode( {SecondarySyncCode::sssS0m0,SecondarySyncCode::sssS0m8, SecondarySyncCode::sssS0m16,
-               SecondarySyncCode::sssS1m1, SecondarySyncCode::sssS1m9, SecondarySyncCode::sssS1m17}),
-	  debug(System::DebugInfo::Locate())
+      sssCode( {SecondarySyncCode::sss0Even,SecondarySyncCode::sss0Odd, SecondarySyncCode::sss1Odd, SecondarySyncCode::sss1Even}),
+      debug(System::DebugInfo::Locate())
 {
     for (int i = 0; i < ResultAmount; ++i) {
         corrRes[i].resize(SssFftCorrLen);
@@ -71,9 +70,6 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
 
     for( uint32_t count = 0; count < 2; ++count ) {
 
-
-
-
         auto evenPart = sssParts[2*count].data();
         sss.DemodCt(evenPart, nid2);
 {
@@ -83,14 +79,14 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
 }
         fft32.DoIt(evenPart,sssSpectrumPart.data());
         FindSeq(&count, 0);
-        corr[count].M0 = CalcM0(est_m0.place) ;
+        corr[count].M0 = (est_m0.place);
 
 
         auto oddPart  = sssParts[2*count+1].data();
         sss.DemodCtZt(oddPart,nid2,corr[count].M0);
         fft32.DoIt(oddPart,sssSpectrumPart.data());
         FindSeq(&count, 1);
-        corr[count].M1 = CalcM1(est_m1.place) - 1;
+        corr[count].M1 = (est_m1.place);
 
         corr[count].corrRes = est_m0.val + est_m1.val;
 
@@ -181,32 +177,24 @@ void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParam
     const ComplexFloat* sssData = data + sssPos;
 
     std::copy(&sssData[0], &sssData[SyncCode::FFTLEN], sssSignal.data());
-//    sssSignal.assign(&sssData[0], &sssData[SyncCode::FFTLEN]);
 
     fft128.DoIt(sssSignal.data(),sssSpectrum.data());
-
-    sssSignal.assign(sssSpectrum.data(), sssSpectrum.data() + sssSpectrum.size());
-
     fft128.Shift(sssSpectrum.data(),sssSignal.data());
 
+    //sssSignal.assign(sssSpectrum.data(), sssSpectrum.data() + sssSpectrum.size());
     auto evenPart = sssParts[0].data();
     auto oddPart  = sssParts[1].data();
 
     for( int32_t i = startPos0; i < endPos0; i+=2)
         *evenPart++ = sssSignal[i];
-
     for( int32_t i = startPos1+1; i < endPos1; i+=2 )
         *evenPart++ = sssSignal[i];
-
     for( int32_t i = startPos0+1; i < endPos0; i+=2)
         *oddPart++ = sssSignal[i];
-
     for( int32_t i = startPos1; i < endPos1+1; i+=2 )
         *oddPart++ = sssSignal[i];
-
     *evenPart = ComplexFloat(0,0);
     *oddPart = ComplexFloat(0,0);
-
     sssParts[2].assign(sssParts[1].begin(), sssParts[1].end()); // for SSS0 and SSS1 correlating
     sssParts[3].assign(sssParts[0].begin(), sssParts[0].end());
 
@@ -266,34 +254,26 @@ uint32_t SssCorrelator::GetPssOffsetFrame(CyclicPrefix cp, Duplex dx)
 
 void SssCorrelator::FindSeq(uint32_t * count, uint32_t evenOrOdd)
 {
-    for (uint32_t i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
 
         resultNum[i].place = 0;
         resultNum[i].val   = 0;
-        auto& code = sss.GetSpecCode(sssCode[3* *count + i]);
-        for( auto sIt = sssSpectrumPart.begin(), cIt = code.begin(),
+        auto& code = sss.GetSpecCode(sssCode[2* *count + evenOrOdd]);;
+
+
+        for( auto sIt = sssSpectrumPart.begin(), cIt = code[i].begin(),
              fIt = fftCorrRes[i].begin();        sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
             *fIt = conj_mpy(*sIt,*cIt);
         fft32.Undo(fftCorrRes[i].data(),corrRes[i].data());
-
                                {std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
                                output.write(reinterpret_cast<char*>(corrRes[i].data()),corrRes[i].size() * sizeof(corrRes[i][0]));
                                output.close();}
-        for (uint32_t p = 0; p < SssFftCorrLen; ) {
+        for (int p = 0; p < SssFftCorrLen; ) {
             absCorrRes[p] =  abs(corrRes[i][p]);
 
-            uint32_t a = 0;
-            if (i==0)
-                a = 0;
-            else if (i==1)
-                a = 7;
-            else if (i==2)
-                a = 15;
-
             if (resultNum[i].val<absCorrRes[p]) {
-
                 resultNum[i].val = absCorrRes[p];
-                resultNum[i].place = (p - a);
+                resultNum[i].place = (p + i*8)%SssFftCorrLen;
                 ++p;}
             else {++p;}
                 }
@@ -311,13 +291,18 @@ void SssCorrelator::FindSeq(uint32_t * count, uint32_t evenOrOdd)
             else {
                 ++i;}
         }
+        ///определение места делается успешно, после этого пересчёт в m0 m1,
+        /// на данный момент не работает как нужно, даёт такой же
+        /// результат как и первый вариант.
+
         if (evenOrOdd == 0) {
-            est_m0.place = temp.place;
+            est_m0.place = SssFftCorrLen - temp.place;
             est_m0.val   = temp.val;}
         else {
-            est_m1.place = temp.place;
+            est_m1.place = (SssFftCorrLen - temp.place + 1)%SssFftCorrLen;
             est_m1.val   = temp.val;
         };
+        std::cout<<"";
     }
 
 

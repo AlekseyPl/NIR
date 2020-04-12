@@ -40,7 +40,7 @@ public:
     struct searchRes
     {
         float32 val    = 0;
-        uint32_t place = 0;
+        int place = 0;
     };
 
 	void			Configure(SearchDepth s);
@@ -102,7 +102,7 @@ private:
 
 	SecondarySyncCode			sss;
 	M0M1Converter				m0m1;
-	std::array<SecondarySyncCode::SpecCode, VariantsCount>	sssCode;
+    std::array<SecondarySyncCode::SpecCode, VariantsCount>	sssCode;
 
 	uint32_t					m0;
 	uint32_t					m1;

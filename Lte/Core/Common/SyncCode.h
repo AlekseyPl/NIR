@@ -65,15 +65,15 @@ public:
 	virtual ~SecondarySyncCode( ){ }
 	static const int32_t SSS_FFT_LEN = LTESyncCodeHalfLen+1;
 
-//	enum SpecCode {
-//		sss0Even = 0,
-//		sss0Odd  = 1,
-//		sss1Even = 2,
-//		sss1Odd  = 3,
-
-//	};
-
     enum SpecCode {
+        sss0Even = 0,
+        sss0Odd  = 1,
+        sss1Even = 2,
+        sss1Odd  = 3,
+
+    };
+
+    /*enum SpecCode {
         sssS0m0  = 0,
         sssS0m8  = 1,
         sssS0m16 = 2,
@@ -81,10 +81,11 @@ public:
         sssS1m9  = 4,
         sssS1m17 = 5,
 
-    };
+    };*/
 
 	std::vector< ComplexFloat >& 	GetCode( int32_t nid1, int32_t nid2, int32_t num );
-	std::vector< ComplexFloat >&	GetSpecCode( SpecCode code);
+    std::array<std::vector< ComplexFloat >, 3> &	GetSpecCode(SecondarySyncCode::SpecCode code);
+
 	float						 	GetAmp( int32_t nid1, int32_t nid2, int32_t num );
 
 	void							DemodCt(ComplexFloat* signal, int32_t nid2);
@@ -108,8 +109,12 @@ private:
 
 	Math::FftSP					fft32;
 
-	std::vector< ComplexFloat>	sssSpectrs[SSS_SPEC_COUNT];
+    //std::vector< ComplexFloat>	sssSpectrs[SSS_SPEC_COUNT];
 
+//    std::vector< ComplexFloat>  sssSpectrsS0mX[3];
+//    std::vector<ComplexFloat>   sssSpectrsS1mX[3];
+    std::array<std::vector< ComplexFloat >, 3> 	sssSpectrsS0mX;
+    std::array<std::vector< ComplexFloat >, 3> 	sssSpectrsS1mX;
 
 	void	Generate( );
 	void	GenerateV2( );
