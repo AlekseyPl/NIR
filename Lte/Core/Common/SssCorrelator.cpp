@@ -6,25 +6,30 @@
 
 
 namespace Lte {
-
+//бпф 128 то
 SssCorrelator::SssCorrelator():
-	  startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen),
-	  startPos1(SyncCode::FFTLEN / 2 + 1),
-	  endPos0(SyncCode::FFTLEN/2),
-	  endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen),
+      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen),//64 - 31 = 33
+      startPos1(SyncCode::FFTLEN / 2 + 1),//
+      endPos0(SyncCode::FFTLEN/2),//128/2 = 64
+      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen),//128/2+31
       fft32(SssFftCorrLen/*,Common::AllocatorHeapCached::Locate()*/),
       fft128(SyncCode::FFTLEN/*, Common::AllocatorHeapCached::Locate()*/),
-	  sssCode( {SecondarySyncCode::sss0Even,SecondarySyncCode::sss0Odd, SecondarySyncCode::sss1Odd, SecondarySyncCode::sss1Even}),
+      sssCode( {SecondarySyncCode::sssS0m0,SecondarySyncCode::sssS0m8, SecondarySyncCode::sssS0m16,
+               SecondarySyncCode::sssS1m1, SecondarySyncCode::sssS1m9, SecondarySyncCode::sssS1m17}),
 	  debug(System::DebugInfo::Locate())
 {
-	corrRes.resize(SssFftCorrLen);
-	fftCorrRes.resize(SssFftCorrLen);
+    for (int i = 0; i < ResultAmount; ++i) {
+        corrRes[i].resize(SssFftCorrLen);
+        fftCorrRes[i].resize(SssFftCorrLen);
+    }
+    absCorrRes.resize(SssFftCorrLen);
+
 	searchParams.reserve(VariantsCount);
-
 	sssSpectrumPart.resize(SssFftCorrLen);
-
 	sssSignal.resize(SyncCode::FFTLEN);
 	sssSpectrum.resize(SyncCode::FFTLEN);
+    resultNum.resize(ResultAmount);
+
 
 	for(auto& sp : sssParts)	sp.resize(SssFftCorrLen);
 }
@@ -58,119 +63,153 @@ SssCorrelator::SearchResult	SssCorrelator::Do(const ComplexFloat* data, uint32_t
 
 	return SearchResult(resNid1, offset, sfNum, cp,dx );
 }
-
-
 SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
 {
-	SssCorrRes corr[2];
-	corr[0].subframeNum = 0;
-	corr[1].subframeNum = 5;
-// 2 sss в одном куске чётные и нечётный. эталон сделан для нид 1 = 0.
-	for( uint32_t count = 0; count < 2; ++count ) {
-		auto& code0 = sss.GetSpecCode(sssCode[2*count]);
-		auto& code1 = sss.GetSpecCode(sssCode[2*count+1]);
+    SssCorrRes corr[2];
+    corr[0].subframeNum = 0;
+    corr[1].subframeNum = 5;
 
-//        std::ofstream output("/home/stepan/matlab_scripts/Spec_code_data.dat", std::ios::binary);
-//        output.write(reinterpret_cast<char*>(pbchStore.symbols), pbchStore.symb_capacity * sizeof(pbchStore.symbols[0]));
-//        output.close();
-//        std::cout<<"1 halfCP"<<std::endl;
-//        std::cout<<"=========================="<<std::endl;
-
-		auto evenPart = sssParts[2*count].data();
-		auto oddPart  = sssParts[2*count+1].data();
-
-		sss.DemodCt(evenPart, nid2);
-		fft32.DoIt(evenPart,sssSpectrumPart.data());
-
-//        for( auto sIt = sssSpectrumPart.begin(), cIt = code0.begin(),fIt = fftCorrRes.begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
-
-//            *fIt = conj_mpy(*sIt,*cIt);
-
-        std::transform(sssSpectrumPart.begin(),sssSpectrumPart.end(),code0.begin(), fftCorrRes.begin(),
-                                   [](ComplexFloat v1, ComplexFloat v2) { return conj_mpy(v1, v2);} );
-
-
-		fft32.Undo(fftCorrRes.data(),corrRes.data());
-
-		auto maxComplexFloat = [](ComplexFloat a, ComplexFloat b) {return abs(a)<abs(b);};
-		auto maxEl0 = std::max_element(corrRes.begin(),corrRes.end(),maxComplexFloat);
-
-                std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
-                output.write(reinterpret_cast<char*>(corrRes.data()),corrRes.size() * sizeof(corrRes[0]));
-                output.close();
-                std::cout<<"1 halfCP"<<std::endl;
-                std::cout<<"=========================="<<std::endl;
+    for( uint32_t count = 0; count < 2; ++count ) {
 
 
 
-corr[count].M0 = CalcM0(std::distance(corrRes.begin(),maxEl0));
-//        if (corr[count].M0 == 20) {
-//            std::cout<<20<<"+++++++++++++++++++++++++++++++++++++++++++++++++"<<std::endl;
-//            break;
 
-//        }
-		sss.DemodCtZt(oddPart,nid2,corr[count].M0);
-		fft32.DoIt(oddPart,sssSpectrumPart.data());
-
-//		for( auto sIt = sssSpectrumPart.begin(), cIt = code1.begin(),fIt = fftCorrRes.begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
-
-//			*fIt = conj_mpy(*sIt,*cIt);
-
-        std::transform(sssSpectrumPart.begin(),sssSpectrumPart.end(),code1.begin(), fftCorrRes.begin(),
-                                   [](ComplexFloat v1, ComplexFloat v2) { return conj_mpy(v1, v2);} );
-
-		fft32.Undo(fftCorrRes.data(),corrRes.data());
-
-
-        auto maxComplexFloat2 = [](ComplexFloat a, ComplexFloat b) {return abs(a)<abs(b);};
-
-        std::ofstream output2("/home/stepan/matlab_scripts/corrres2_code_data.dat", std::ios::binary);
-        output2.write(reinterpret_cast<char*>(corrRes.data()),corrRes.size() * sizeof(corrRes[0]));
-        output2.close();
-        std::cout<<"1 halfCP"<<std::endl;
-        std::cout<<"=========================="<<std::endl;
-
-
-
-        auto maxEl1 = std::max_element(corrRes.begin(),corrRes.end(),maxComplexFloat2);
-		corr[count].M1 = CalcM1(std::distance(corrRes.begin(),maxEl1));
-		corr[count].corrRes = abs(*maxEl0) + abs(*maxEl1);
-	}
-
-	return std::max(corr[0],corr[1]);
+        auto evenPart = sssParts[2*count].data();
+        sss.DemodCt(evenPart, nid2);
+{
+                        std::ofstream output0("/home/stepan/Документы/matlab_game dcripts", std::ios::binary);
+                        output0.write(reinterpret_cast<char*>(sssParts[2*count].data()),sssParts[2*count].size() * sizeof(sssParts[2*count][0]));
+                        output0.close();
 }
+        fft32.DoIt(evenPart,sssSpectrumPart.data());
+        FindSeq(&count, 0);
+        corr[count].M0 = CalcM0(est_m0.place) ;
+
+
+        auto oddPart  = sssParts[2*count+1].data();
+        sss.DemodCtZt(oddPart,nid2,corr[count].M0);
+        fft32.DoIt(oddPart,sssSpectrumPart.data());
+        FindSeq(&count, 1);
+        corr[count].M1 = CalcM1(est_m1.place) - 1;
+
+        corr[count].corrRes = est_m0.val + est_m1.val;
+
+    }
+
+    return std::max(corr[0],corr[1]);
+}
+/*//SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
+//{
+//	SssCorrRes corr[2];
+//	corr[0].subframeNum = 0;
+//	corr[1].subframeNum = 5;
+//// 2 sss в одном куске чётные и нечётный. эталон сделан для нид 1 = 0.
+//	for( uint32_t count = 0; count < 2; ++count ) {
+//		auto& code0 = sss.GetSpecCode(sssCode[2*count]);
+//		auto& code1 = sss.GetSpecCode(sssCode[2*count+1]);
+
+////        std::ofstream output("/home/stepan/matlab_scripts/Spec_code_data.dat", std::ios::binary);
+////        output.write(reinterpret_cast<char*>(pbchStore.symbols), pbchStore.symb_capacity * sizeof(pbchStore.symbols[0]));
+////        output.close();
+////        std::cout<<"1 halfCP"<<std::endl;
+////        std::cout<<"=========================="<<std::endl;
+
+//		auto evenPart = sssParts[2*count].data();
+//		auto oddPart  = sssParts[2*count+1].data();
+
+//		sss.DemodCt(evenPart, nid2);
+//		fft32.DoIt(evenPart,sssSpectrumPart.data());
+
+////        for( auto sIt = sssSpectrumPart.begin(), cIt = code0.begin(),fIt = fftCorrRes.begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
+
+////            *fIt = conj_mpy(*sIt,*cIt);
+
+//        std::transform(sssSpectrumPart.begin(),sssSpectrumPart.end(),code0.begin(), fftCorrRes.begin(),
+//                                   [](ComplexFloat v1, ComplexFloat v2) { return conj_mpy(v1, v2);} );
+
+
+//		fft32.Undo(fftCorrRes.data(),corrRes.data());
+
+//		auto maxComplexFloat = [](ComplexFloat a, ComplexFloat b) {return abs(a)<abs(b);};
+//		auto maxEl0 = std::max_element(corrRes.begin(),corrRes.end(),maxComplexFloat);
+
+////                std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
+////                output.write(reinterpret_cast<char*>(corrRes.data()),corrRes.size() * sizeof(corrRes[0]));
+////                output.close();
+////                std::cout<<"1 halfCP"<<std::endl;
+////                std::cout<<"=========================="<<std::endl;
+
+
+
+//        corr[count].M0 = CalcM0(std::distance(corrRes.begin(),maxEl0));
+
+//		sss.DemodCtZt(oddPart,nid2,corr[count].M0);
+//		fft32.DoIt(oddPart,sssSpectrumPart.data());
+
+////		for( auto sIt = sssSpectrumPart.begin(), cIt = code1.begin(),fIt = fftCorrRes.begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
+
+////			*fIt = conj_mpy(*sIt,*cIt);
+
+//        std::transform(sssSpectrumPart.begin(),sssSpectrumPart.end(),code1.begin(), fftCorrRes.begin(),
+//                                   [](ComplexFloat v1, ComplexFloat v2) { return conj_mpy(v1, v2);} );
+
+//		fft32.Undo(fftCorrRes.data(),corrRes.data());
+
+
+//        auto maxComplexFloat2 = [](ComplexFloat a, ComplexFloat b) {return abs(a)<abs(b);};
+
+////        std::ofstream output2("/home/stepan/matlab_scripts/corrres2_code_data.dat", std::ios::binary);
+////        output2.write(reinterpret_cast<char*>(corrRes.data()),corrRes.size() * sizeof(corrRes[0]));
+////        output2.close();
+////        std::cout<<"1 halfCP"<<std::endl;
+////        std::cout<<"=========================="<<std::endl;
+
+
+
+//        auto maxEl1 = std::max_element(corrRes.begin(),corrRes.end(),maxComplexFloat2);
+//		corr[count].M1 = CalcM1(std::distance(corrRes.begin(),maxEl1));
+//		corr[count].corrRes = abs(*maxEl0) + abs(*maxEl1);
+//	}
+
+//	return std::max(corr[0],corr[1]);
+//}*/
 
 void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos)
 {
-	int32_t sssPos = pssPos - params.shiftPssToSss/DecimFactor ;
-	if( sssPos < 0 ) sssPos += CorrCount;
-	const ComplexFloat* sssData = data + sssPos;
+    int32_t sssPos = pssPos - params.shiftPssToSss/DecimFactor ;
+    if( sssPos < 0 ) sssPos += CorrCount;
+    const ComplexFloat* sssData = data + sssPos;
 
-	std::copy(&sssData[0], &sssData[SyncCode::FFTLEN], sssSignal.data());
+    std::copy(&sssData[0], &sssData[SyncCode::FFTLEN], sssSignal.data());
+//    sssSignal.assign(&sssData[0], &sssData[SyncCode::FFTLEN]);
 
-	fft128.DoIt(sssSignal.data(),sssSpectrum.data());
-	fft128.Shift(sssSpectrum.data(),sssSignal.data());
+    fft128.DoIt(sssSignal.data(),sssSpectrum.data());
 
-	auto evenPart = sssParts[0].data();
-	auto oddPart  = sssParts[1].data();
+    sssSignal.assign(sssSpectrum.data(), sssSpectrum.data() + sssSpectrum.size());
 
-	for( int32_t i = startPos0; i < endPos0; i+=2)
-		*evenPart++ = sssSignal[i];
+    fft128.Shift(sssSpectrum.data(),sssSignal.data());
 
-	for( int32_t i = startPos1+1; i < endPos1; i+=2 )
-		*evenPart++ = sssSignal[i];
+    auto evenPart = sssParts[0].data();
+    auto oddPart  = sssParts[1].data();
 
-	for( int32_t i = startPos0+1; i < endPos0; i+=2)
-		*oddPart++ = sssSignal[i];
+    for( int32_t i = startPos0; i < endPos0; i+=2)
+        *evenPart++ = sssSignal[i];
 
-	for( int32_t i = startPos1; i < endPos1+1; i+=2 )
-		*oddPart++ = sssSignal[i];
+    for( int32_t i = startPos1+1; i < endPos1; i+=2 )
+        *evenPart++ = sssSignal[i];
 
-	*evenPart = ComplexFloat(0,0);
-	*oddPart = ComplexFloat(0,0);
+    for( int32_t i = startPos0+1; i < endPos0; i+=2)
+        *oddPart++ = sssSignal[i];
 
-	sssParts[2].assign(sssParts[1].begin(), sssParts[1].end()); // for SSS0 and SSS1 correlating
-	sssParts[3].assign(sssParts[0].begin(), sssParts[0].end());
+    for( int32_t i = startPos1; i < endPos1+1; i+=2 )
+        *oddPart++ = sssSignal[i];
+
+    *evenPart = ComplexFloat(0,0);
+    *oddPart = ComplexFloat(0,0);
+
+    sssParts[2].assign(sssParts[1].begin(), sssParts[1].end()); // for SSS0 and SSS1 correlating
+    sssParts[3].assign(sssParts[0].begin(), sssParts[0].end());
+
 }
 
 void	SssCorrelator::Configure(const SearchDepth sd)
@@ -224,6 +263,62 @@ uint32_t SssCorrelator::GetPssOffsetFrame(CyclicPrefix cp, Duplex dx)
     }
     return offset;
 }
+
+void SssCorrelator::FindSeq(uint32_t * count, uint32_t evenOrOdd)
+{
+    for (uint32_t i = 0; i < 3; ++i) {
+
+        resultNum[i].place = 0;
+        resultNum[i].val   = 0;
+        auto& code = sss.GetSpecCode(sssCode[3* *count + i]);
+        for( auto sIt = sssSpectrumPart.begin(), cIt = code.begin(),
+             fIt = fftCorrRes[i].begin();        sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
+            *fIt = conj_mpy(*sIt,*cIt);
+        fft32.Undo(fftCorrRes[i].data(),corrRes[i].data());
+
+                               {std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
+                               output.write(reinterpret_cast<char*>(corrRes[i].data()),corrRes[i].size() * sizeof(corrRes[i][0]));
+                               output.close();}
+        for (uint32_t p = 0; p < SssFftCorrLen; ) {
+            absCorrRes[p] =  abs(corrRes[i][p]);
+
+            uint32_t a = 0;
+            if (i==0)
+                a = 0;
+            else if (i==1)
+                a = 7;
+            else if (i==2)
+                a = 15;
+
+            if (resultNum[i].val<absCorrRes[p]) {
+
+                resultNum[i].val = absCorrRes[p];
+                resultNum[i].place = (p - a);
+                ++p;}
+            else {++p;}
+                }
+        }
+        searchRes temp;
+        temp.place = resultNum[0].place;
+        temp.val = resultNum[0].val;
+
+        for (uint32_t i = 0; i < ResultAmount;) {
+
+            if (resultNum[i].place< temp.place) {
+                temp.place = resultNum[i].place;
+                temp.val = resultNum[i].val;
+                ++i;}
+            else {
+                ++i;}
+        }
+        if (evenOrOdd == 0) {
+            est_m0.place = temp.place;
+            est_m0.val   = temp.val;}
+        else {
+            est_m1.place = temp.place;
+            est_m1.val   = temp.val;
+        };
+    }
 
 
 

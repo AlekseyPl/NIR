@@ -65,12 +65,23 @@ public:
 	virtual ~SecondarySyncCode( ){ }
 	static const int32_t SSS_FFT_LEN = LTESyncCodeHalfLen+1;
 
-	enum SpecCode {
-		sss0Even = 0,
-		sss0Odd  = 1,
-		sss1Even = 2,
-		sss1Odd  = 3,
-	};
+//	enum SpecCode {
+//		sss0Even = 0,
+//		sss0Odd  = 1,
+//		sss1Even = 2,
+//		sss1Odd  = 3,
+
+//	};
+
+    enum SpecCode {
+        sssS0m0  = 0,
+        sssS0m8  = 1,
+        sssS0m16 = 2,
+        sssS1m1  = 3,
+        sssS1m9  = 4,
+        sssS1m17 = 5,
+
+    };
 
 	std::vector< ComplexFloat >& 	GetCode( int32_t nid1, int32_t nid2, int32_t num );
 	std::vector< ComplexFloat >&	GetSpecCode( SpecCode code);
@@ -80,7 +91,7 @@ public:
 	void							DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m0);
 
 private:
-	static const uint32_t SSS_SPEC_COUNT = 2;
+    static const uint32_t SSS_SPEC_COUNT = 6;
 
 	std::array< std::array< std::vector< ComplexFloat >, SSS_COUNT >, PSS_COUNT> sss0;
 	std::array< std::array< std::vector< ComplexFloat >, SSS_COUNT >, PSS_COUNT> sss1;

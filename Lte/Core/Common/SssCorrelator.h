@@ -37,6 +37,12 @@ public:
 		Duplex			dx;
 	};
 
+    struct searchRes
+    {
+        float32 val    = 0;
+        uint32_t place = 0;
+    };
+
 	void			Configure(SearchDepth s);
 	SearchResult	Do(const ComplexFloat* data, uint32_t nid2, uint32_t pssPos);
     uint32_t GetPssOffsetFrame(CyclicPrefix cp, Duplex dx);
@@ -45,8 +51,9 @@ private:
 	static const uint32_t DecimFactor = 16;
 	static const uint32_t CorrCount = LTEFrameLength / DecimFactor;
 
-	static const uint32_t VariantsCount = 4;
+    static const uint32_t VariantsCount = 6;
 	static const uint32_t SssPartsCount = 4;
+    static const uint32_t ResultAmount = 3;
 
 	struct 	SearchParams {
 		int32_t			shiftPssToSss;
@@ -66,21 +73,30 @@ private:
 		}
 	};
 
+
 	const int32_t				startPos0;
 	const int32_t				startPos1;
 	const int32_t				endPos0;
 	const int32_t				endPos1;
+    searchRes                   est_m0;
+    searchRes                   est_m1;
 
 	std::vector<SearchParams>	searchParams;
-	Math::FftSP					fft32;
+    Math::FftSP					fft32;
 	Math::FftSP					fft128;
 
-	std::vector<ComplexFloat>	corrRes;
-	std::vector<ComplexFloat>	fftCorrRes;
+
+    std::array <std::vector<ComplexFloat>, ResultAmount>	corrRes;
+    std::array <std::vector<ComplexFloat>, ResultAmount>	fftCorrRes;
+    std::vector <float32>                                   absCorrRes;
+
+    std::vector <searchRes> resultNum;
+
+
 
 	std::vector<ComplexFloat>	sssSignal;
 	std::vector<ComplexFloat>	sssSpectrum;
-	std::array<std::vector<ComplexFloat>, SssPartsCount>	sssParts;
+    std::array <std::vector<ComplexFloat>, SssPartsCount>	sssParts;
 
 	std::vector<ComplexFloat>	sssSpectrumPart;
 
@@ -97,12 +113,13 @@ private:
 	System::DebugInfo&	debug;
 	SssCorrRes	Correlate(uint32_t nid2);
 	void		ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos);
+    void FindSeq(uint32_t *count, uint32_t evenOrOdd);
 };
 
 
 inline uint32_t SssCorrelator::CalcM0(uint32_t pos)
 {
-	return SssFftCorrLen - pos;
+    return SssFftCorrLen - pos;
 }
 
 inline uint32_t SssCorrelator::CalcM1(uint32_t pos)
