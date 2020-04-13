@@ -7,11 +7,12 @@
 
 namespace Lte {
 //бпф 128
+int a = 0;
 SssCorrelator::SssCorrelator():
-      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen),//64 - 31 = 33
-      startPos1(SyncCode::FFTLEN / 2 + 1),//
-      endPos0(SyncCode::FFTLEN/2),//128/2 = 64
-      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen),//128/2+31
+      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen +a),//64 - 31 = 33
+      startPos1(SyncCode::FFTLEN / 2 + 1 +a),//
+      endPos0(SyncCode::FFTLEN/2 +a ),//128/2 = 64
+      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen +a),//128/2+31
       fft32(SssFftCorrLen/*,Common::AllocatorHeapCached::Locate()*/),
       fft128(SyncCode::FFTLEN/*, Common::AllocatorHeapCached::Locate()*/),
       sssCode( {SecondarySyncCode::sss0Even,SecondarySyncCode::sss0Odd, SecondarySyncCode::sss1Odd, SecondarySyncCode::sss1Even}),
@@ -295,13 +296,34 @@ void SssCorrelator::FindSeq(uint32_t * count, uint32_t evenOrOdd)
         /// на данный момент не работает как нужно, даёт такой же
         /// результат как и первый вариант.
 
-        if (evenOrOdd == 0) {
-            est_m0.place = SssFftCorrLen - temp.place;
-            est_m0.val   = temp.val;}
-        else {
-            est_m1.place = (SssFftCorrLen - temp.place + 1)%SssFftCorrLen;
-            est_m1.val   = temp.val;
+
+        enum sfnum {
+            sss0E = 0,
+            sss0O  = 1,
+            sss1E = 2,
+            sss1O  = 3,
+
         };
+//        sfnum code;
+
+        switch(2* *count + evenOrOdd) {
+        case sss0E:
+        case sss1O:
+            est_m0.place = SssFftCorrLen - temp.place;
+            est_m0.val   = temp.val;
+            break;
+        case sss0O:
+        case sss1E:
+            est_m1.place = (SssFftCorrLen - temp.place + 1)%SssFftCorrLen;
+            est_m1.val   =  temp.val;
+            break;
+        }
+
+//        if (evenOrOdd == 0) {
+//           }
+//        else {
+
+
         std::cout<<"";
     }
 
