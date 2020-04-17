@@ -6,13 +6,13 @@
 #include <string>
 
 namespace Lte {
-//бпф 128
+
 int a = 0;
 SssCorrelator::SssCorrelator():
-      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen +a),//64 - 31 = 33
-      startPos1(SyncCode::FFTLEN / 2 + 1 +a),//
-      endPos0(SyncCode::FFTLEN/2 +a ),//128/2 = 64
-      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen +a),//128/2+31
+      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen +a),
+      startPos1(SyncCode::FFTLEN / 2 + 1 +a),
+      endPos0(SyncCode::FFTLEN/2 +a ),
+      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen +a),
       fft32(SssFftCorrLen/*,Common::AllocatorHeapCached::Locate()*/),
       fft128(SyncCode::FFTLEN/*, Common::AllocatorHeapCached::Locate()*/),
       sssCode( {SecondarySyncCode::sss0Even,SecondarySyncCode::sss0Odd, SecondarySyncCode::sss5Odd, SecondarySyncCode::sss5Even}),
@@ -75,10 +75,6 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
 
     for( uint32_t count = 0; count < 2; ++count ) {
 
-        //неправильно, в зависимости от четной и нечетной части нужно делать
-        //разные алгоритмы
-
-
 
         auto evenPart = sssParts[2*count].data();
         sss.DemodCt(evenPart, nid2);
@@ -90,120 +86,26 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
         fft32.DoIt(evenPart,sssSpectrumPart.data());
         FindSeq(&count, 0);
         if (count == 0) corr[count].M0 = (SssFftCorrLen -  est_m.place - 1);
-        else corr[count].M1 = (est_m.place);
+        else corr[count].M1 = (SssFftCorrLen - est_m.place)%SssFftCorrLen;
 
         auto temp1 = est_m.val;
 
         auto oddPart  = sssParts[2*count+1].data();
         sss.DemodCtZt(oddPart,nid2,SssFftCorrLen -  est_m.place - 1);
-
         fft32.DoIt(oddPart,sssSpectrumPart.data());
         FindSeq(&count, 1);
         if (count == 0) corr[count].M1 = ((SssFftCorrLen - est_m.place)%SssFftCorrLen);
-        else corr[count].M0 = ( est_m.place);
+        else corr[count].M0 = ( SssFftCorrLen -  est_m.place);
 
         auto temp2 = est_m.val;
-        //debug=======================================================
-        {
-            std::string subframe_num;
-
-            int32_t resnid = m0m1.GetNid1(M0M1(corr[count].M0,corr[count].M1));
-            if (count==0) subframe_num = "подкадр: 0, ";
-
-            else
-                subframe_num = " подкадр :5 ";
-            std::cout<<subframe_num<<std::endl<<"m0: "<<est_m0.place<<"  m1: "<<est_m1.place<<std::endl;
-            std::cout<<"возможный Nid1: "<<resnid<<std::endl;
-
-
-
-        }
-
-
-        //eof debug===================================================
-        corr[count].corrRes = temp1 + temp2;
+\
+        corr[count].corrRes = temp1+temp2;
         std::cout<<"";
 
     }
 
     return std::max(corr[0],corr[1]);
 }
-/*//SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
-//{
-//	SssCorrRes corr[2];
-//	corr[0].subframeNum = 0;
-//	corr[1].subframeNum = 5;
-//// 2 sss в одном куске чётные и нечётный. эталон сделан для нид 1 = 0.
-//	for( uint32_t count = 0; count < 2; ++count ) {
-//		auto& code0 = sss.GetSpecCode(sssCode[2*count]);
-//		auto& code1 = sss.GetSpecCode(sssCode[2*count+1]);
-
-////        std::ofstream output("/home/stepan/matlab_scripts/Spec_code_data.dat", std::ios::binary);
-////        output.write(reinterpret_cast<char*>(pbchStore.symbols), pbchStore.symb_capacity * sizeof(pbchStore.symbols[0]));
-////        output.close();
-////        std::cout<<"1 halfCP"<<std::endl;
-////        std::cout<<"=========================="<<std::endl;
-
-//		auto evenPart = sssParts[2*count].data();
-//		auto oddPart  = sssParts[2*count+1].data();
-
-//		sss.DemodCt(evenPart, nid2);
-//		fft32.DoIt(evenPart,sssSpectrumPart.data());
-
-////        for( auto sIt = sssSpectrumPart.begin(), cIt = code0.begin(),fIt = fftCorrRes.begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
-
-////            *fIt = conj_mpy(*sIt,*cIt);
-
-//        std::transform(sssSpectrumPart.begin(),sssSpectrumPart.end(),code0.begin(), fftCorrRes.begin(),
-//                                   [](ComplexFloat v1, ComplexFloat v2) { return conj_mpy(v1, v2);} );
-
-
-//		fft32.Undo(fftCorrRes.data(),corrRes.data());
-
-//		auto maxComplexFloat = [](ComplexFloat a, ComplexFloat b) {return abs(a)<abs(b);};
-//		auto maxEl0 = std::max_element(corrRes.begin(),corrRes.end(),maxComplexFloat);
-
-////                std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
-////                output.write(reinterpret_cast<char*>(corrRes.data()),corrRes.size() * sizeof(corrRes[0]));
-////                output.close();
-////                std::cout<<"1 halfCP"<<std::endl;
-////                std::cout<<"=========================="<<std::endl;
-
-
-
-//        corr[count].M0 = CalcM0(std::distance(corrRes.begin(),maxEl0));
-
-//		sss.DemodCtZt(oddPart,nid2,corr[count].M0);
-//		fft32.DoIt(oddPart,sssSpectrumPart.data());
-
-////		for( auto sIt = sssSpectrumPart.begin(), cIt = code1.begin(),fIt = fftCorrRes.begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
-
-////			*fIt = conj_mpy(*sIt,*cIt);
-
-//        std::transform(sssSpectrumPart.begin(),sssSpectrumPart.end(),code1.begin(), fftCorrRes.begin(),
-//                                   [](ComplexFloat v1, ComplexFloat v2) { return conj_mpy(v1, v2);} );
-
-//		fft32.Undo(fftCorrRes.data(),corrRes.data());
-
-
-//        auto maxComplexFloat2 = [](ComplexFloat a, ComplexFloat b) {return abs(a)<abs(b);};
-
-////        std::ofstream output2("/home/stepan/matlab_scripts/corrres2_code_data.dat", std::ios::binary);
-////        output2.write(reinterpret_cast<char*>(corrRes.data()),corrRes.size() * sizeof(corrRes[0]));
-////        output2.close();
-////        std::cout<<"1 halfCP"<<std::endl;
-////        std::cout<<"=========================="<<std::endl;
-
-
-
-//        auto maxEl1 = std::max_element(corrRes.begin(),corrRes.end(),maxComplexFloat2);
-//		corr[count].M1 = CalcM1(std::distance(corrRes.begin(),maxEl1));
-//		corr[count].corrRes = abs(*maxEl0) + abs(*maxEl1);
-//	}
-
-//	return std::max(corr[0],corr[1]);
-//}*/
-
 void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos)
 {
     int32_t sssPos = pssPos - params.shiftPssToSss/DecimFactor ;
@@ -215,8 +117,7 @@ void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParam
     fft128.DoIt(sssSignal.data(),sssSpectrum.data());
     fft128.Shift(sssSpectrum.data(),sssSignal.data());
 
-    //sssSignal.assign(sssSpectrum.data(), sssSpectrum.data() + sssSpectrum.size());
-    auto evenPart = sssParts[0].data();
+        auto evenPart = sssParts[0].data();
     auto oddPart  = sssParts[1].data();
 
     for( int32_t i = startPos0; i < endPos0; i+=2)
@@ -329,33 +230,6 @@ void SssCorrelator::FindSeq(uint32_t * count, uint32_t evenOrOdd)
 
         est_m.place = temp.place - 1;
         est_m.val   = temp.val;
-
-
-        enum sfnum {
-            sss0E = 0,
-            sss0O  = 1,
-            sss1E = 2,
-            sss1O  = 3,
-
-        };
-//        sfnum code;
-
-        switch(2* *count + evenOrOdd) {
-        case sss0E:
-        case sss1O:
-            est_m0.place = SssFftCorrLen - temp.place;
-            est_m0.val   = temp.val;
-            break;
-        case sss0O:
-        case sss1E:
-            est_m1.place = (SssFftCorrLen - temp.place + 1)%SssFftCorrLen;
-            est_m1.val   =  temp.val;
-            break;
-        }
-
-
-
-
     }
 
 
