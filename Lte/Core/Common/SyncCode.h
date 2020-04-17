@@ -68,8 +68,8 @@ public:
     enum SpecCode {
         sss0Even = 0,
         sss0Odd  = 1,
-        sss1Even = 2,
-        sss1Odd  = 3,
+        sss5Even = 2,
+        sss5Odd  = 3,
 
     };
 
@@ -89,7 +89,7 @@ public:
 	float						 	GetAmp( int32_t nid1, int32_t nid2, int32_t num );
 
 	void							DemodCt(ComplexFloat* signal, int32_t nid2);
-	void							DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m0);
+    void							DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m);
 
 private:
     static const uint32_t SSS_SPEC_COUNT = 6;

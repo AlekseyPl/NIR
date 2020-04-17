@@ -113,7 +113,7 @@ SecondarySyncCode::SecondarySyncCode( bool isFreqSearch ):
 			for(auto& s0 : sss0.at(nid2))	s0.resize(FFTLEN);
 			for(auto& s1 : sss1.at(nid2))	s1.resize(FFTLEN);
 		}
-		Generate( );
+        Generate( );
 	}
 }
 
@@ -140,13 +140,13 @@ void SecondarySyncCode::GenerateV2()
 	int32_t m1 = m1Val[ nid1 ];
 	for( uint32_t i = 0; i < LTESyncCodeHalfLen; ++i ) {
         s0m0    [ i ] = ComplexFloat(st[ (i + m0)      % LTESyncCodeHalfLen ], 0);
-        s0m8    [ i ] = ComplexFloat(st[ (i + m0 - 8)  % LTESyncCodeHalfLen ], 0);
-        s0m16   [ i ] = ComplexFloat(st[ (i + m0 - 16) % LTESyncCodeHalfLen ], 0);
+        s0m8    [ i ] = ComplexFloat(st[ (i + m0 + 8)  % LTESyncCodeHalfLen ], 0);
+        s0m16   [ i ] = ComplexFloat(st[ (i + m0 + 16) % LTESyncCodeHalfLen ], 0);
 
 
         s1m1[ i ] =  ComplexFloat(st[ ( i + m1)       % LTESyncCodeHalfLen ], 0);
-        s1m9[ i ] =  ComplexFloat(st[ ( i + m1 - 8)   % LTESyncCodeHalfLen ], 0);
-        s1m17[ i ]=  ComplexFloat(st[ ( i + m1 - 16)  % LTESyncCodeHalfLen ], 0);
+        s1m9[ i ] =  ComplexFloat(st[ ( i + m1 + 8)   % LTESyncCodeHalfLen ], 0);
+        s1m17[ i ]=  ComplexFloat(st[ ( i + m1 + 16)  % LTESyncCodeHalfLen ], 0);
 	}
 	s0m0[LTESyncCodeHalfLen]=ComplexFloat(0,0);
     s0m8[LTESyncCodeHalfLen]=ComplexFloat(0,0);
@@ -269,7 +269,7 @@ void SecondarySyncCode::DemodCt(ComplexFloat* signal, int32_t nid2)
 		signal[ i ] *= c0[ i ];
 }
 
-void SecondarySyncCode::DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m0)
+void SecondarySyncCode::DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m)
 {
 	std::vector<float> c1;
 	std::vector<float> z1;
@@ -278,7 +278,13 @@ void SecondarySyncCode::DemodCtZt(ComplexFloat* signal, int32_t nid2, int32_t m0
 
 
 	for( int32_t i = 0; i < LTESyncCodeHalfLen; ++i )
-        z1.push_back( zt[ ( i + ( m0 & 7 ) ) % LTESyncCodeHalfLen ] );//8???jобратить вниммание на m0
+        z1.push_back( zt[ ( i + ( m & 7 ) ) % LTESyncCodeHalfLen ] );
+
+
+
+//    std::ofstream output("/home/stepan/matlab_scripts/s0m0.dat", std::ios::binary);
+//    output.write(reinterpret_cast<char*>(s0m01.data()), s0m01.size() * sizeof(s0m01[0]));
+//    output.close();
 
 	for( int32_t i = 0; i < LTESyncCodeHalfLen; ++i )
         signal[ i ] *= c1[ i ] * z1[ i ];
@@ -368,11 +374,11 @@ std::array<std::vector< ComplexFloat >, 3> & SecondarySyncCode::GetSpecCode(Seco
 {
     switch(code) {
     case SecondarySyncCode::sss0Even:
-    case SecondarySyncCode::sss1Odd:
+    case SecondarySyncCode::sss5Odd:
         return sssSpectrsS0mX;
         break;
     case SecondarySyncCode::sss0Odd:
-    case SecondarySyncCode::sss1Even:
+    case SecondarySyncCode::sss5Even:
         return sssSpectrsS1mX;
         break;
     }

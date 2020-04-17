@@ -68,9 +68,10 @@ private:
 		uint32_t M1;
 		uint32_t subframeNum;
 		float	corrRes;
-		inline bool operator< (const SssCorrRes& rhs) const {
-			return corrRes < rhs.corrRes;
+        inline bool operator< (const SssCorrRes& rhs) const {
+            return corrRes < rhs.corrRes;
 		}
+
 	};
 
 
@@ -80,6 +81,7 @@ private:
 	const int32_t				endPos1;
     searchRes                   est_m0;
     searchRes                   est_m1;
+    searchRes                   est_m;
 
 	std::vector<SearchParams>	searchParams;
     Math::FftSP					fft32;
@@ -91,7 +93,7 @@ private:
     std::vector <float32>                                   absCorrRes;
 
     std::vector <searchRes> resultNum;
-
+    std::vector <SssCorrRes> CorrResults;
 
 
 	std::vector<ComplexFloat>	sssSignal;
