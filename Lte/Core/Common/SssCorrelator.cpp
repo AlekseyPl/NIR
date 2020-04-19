@@ -7,12 +7,12 @@
 
 namespace Lte {
 
-int a = 0;
+
 SssCorrelator::SssCorrelator():
-      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen +a),
-      startPos1(SyncCode::FFTLEN / 2 + 1 +a),
-      endPos0(SyncCode::FFTLEN/2 +a ),
-      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen +a),
+      startPos0(SyncCode::FFTLEN / 2 - LTESyncCodeHalfLen ),
+      startPos1(SyncCode::FFTLEN / 2 + 1 ),
+      endPos0(SyncCode::FFTLEN/2  ),
+      endPos1(SyncCode::FFTLEN/2 + LTESyncCodeHalfLen ),
       fft32(SssFftCorrLen/*,Common::AllocatorHeapCached::Locate()*/),
       fft128(SyncCode::FFTLEN/*, Common::AllocatorHeapCached::Locate()*/),
       sssCode( {SecondarySyncCode::sss0Even,SecondarySyncCode::sss0Odd, SecondarySyncCode::sss5Odd, SecondarySyncCode::sss5Even}),
@@ -28,7 +28,7 @@ SssCorrelator::SssCorrelator():
 	sssSpectrumPart.resize(SssFftCorrLen);
 	sssSignal.resize(SyncCode::FFTLEN);
 	sssSpectrum.resize(SyncCode::FFTLEN);
-    resultNum.resize(ResultAmount);
+
 
 
 	for(auto& sp : sssParts)	sp.resize(SssFftCorrLen);
@@ -75,6 +75,9 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
 
     for( uint32_t count = 0; count < 2; ++count ) {
 
+        searchRes temp1;
+        searchRes temp2;
+        uint32_t genParamM;
 
         auto evenPart = sssParts[2*count].data();
         sss.DemodCt(evenPart, nid2);
@@ -84,26 +87,23 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
                         output0.close();
 }
         fft32.DoIt(evenPart,sssSpectrumPart.data());
-        FindSeq(&count, 0);
-        if (count == 0) corr[count].M0 = (SssFftCorrLen -  est_m.place - 1);
-        else corr[count].M1 = (SssFftCorrLen - est_m.place)%SssFftCorrLen;
-
-        auto temp1 = est_m.val;
+        temp1 =  FindSeq(&count, 0);
+        if (count == 0) {
+            corr[count].M0 = CalcM0( temp1.place );
+            genParamM = corr[count].M0;}
+        else {
+            corr[count].M1 = CalcM1( temp1.place );
+            genParamM = corr[count].M1;}
 
         auto oddPart  = sssParts[2*count+1].data();
-        sss.DemodCtZt(oddPart,nid2,SssFftCorrLen -  est_m.place - 1);
+        sss.DemodCtZt(oddPart,nid2,genParamM);
         fft32.DoIt(oddPart,sssSpectrumPart.data());
-        FindSeq(&count, 1);
-        if (count == 0) corr[count].M1 = ((SssFftCorrLen - est_m.place)%SssFftCorrLen);
-        else corr[count].M0 = ( SssFftCorrLen -  est_m.place);
+        temp2 =  FindSeq(&count, 1);
+        if (count == 0) corr[count].M1 = CalcM1( temp2.place );
+        else            corr[count].M0 = CalcM0( temp2.place );
 
-        auto temp2 = est_m.val;
-\
-        corr[count].corrRes = temp1+temp2;
-        std::cout<<"";
-
+        corr[count].corrRes = temp1.val+temp2.val;
     }
-
     return std::max(corr[0],corr[1]);
 }
 void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos)
@@ -187,51 +187,39 @@ uint32_t SssCorrelator::GetPssOffsetFrame(CyclicPrefix cp, Duplex dx)
     return offset;
 }
 
-void SssCorrelator::FindSeq(uint32_t * count, uint32_t evenOrOdd)
+SssCorrelator::searchRes SssCorrelator::FindSeq(uint32_t* count, uint32_t evenOrOdd)
 {
+    searchRes ResultSpot;
+    std::vector <searchRes> resultNum(ResultAmount);
+
     for (int i = 0; i < 3; ++i) {
-
-        resultNum[i].place = 0;
-        resultNum[i].val   = 0;
-
-        auto& code = sss.GetSpecCode(sssCode[2* *count + evenOrOdd]);;
+        auto& code = sss.GetSpecCode(sssCode[2* *count + evenOrOdd]);
 
         for( auto sIt = sssSpectrumPart.begin(), cIt = code[i].begin(),
              fIt = fftCorrRes[i].begin();        sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
             *fIt = conj_mpy(*sIt,*cIt);
+
         fft32.Undo(fftCorrRes[i].data(),corrRes[i].data());
-                               {std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
+                               {/*std::ofstream output("/home/stepan/matlab_scripts/corrres_code_data.dat", std::ios::binary);
                                output.write(reinterpret_cast<char*>(corrRes[i].data()),corrRes[i].size() * sizeof(corrRes[i][0]));
-                               output.close();}
+                               output.close();*/}
         for (int p = 0; p < SssFftCorrLen; ) {
             absCorrRes[p] =  abs(corrRes[i][p]);
-
             if (resultNum[i].val<absCorrRes[p]) {
                 resultNum[i].val = absCorrRes[p];
                 resultNum[i].place = (p - i*8)%SssFftCorrLen;
                 ++p;}
             else {++p;}
-                }
+            }
         }
-        searchRes temp;
-        temp.place = resultNum[0].place;
-        temp.val = resultNum[0].val;
-
+        ResultSpot = resultNum[0];
         for (uint32_t i = 0; i < ResultAmount;) {
-
-            if (resultNum[i].val> temp.val) {
-                temp.place = resultNum[i].place;
-                temp.val = resultNum[i].val;
-                ++i;}
-            else {
-                ++i;}
+            if (resultNum[i].val > ResultSpot.val) {
+                ResultSpot = resultNum[i];
+                ++i;
+            }
+            else ++i;
         }
-
-
-        est_m.place = temp.place - 1;
-        est_m.val   = temp.val;
+        return ResultSpot;
     }
-
-
-
 }

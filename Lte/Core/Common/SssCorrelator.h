@@ -92,7 +92,7 @@ private:
     std::array <std::vector<ComplexFloat>, ResultAmount>	fftCorrRes;
     std::vector <float32>                                   absCorrRes;
 
-    std::vector <searchRes> resultNum;
+
     std::vector <SssCorrRes> CorrResults;
 
 
@@ -115,7 +115,7 @@ private:
 	System::DebugInfo&	debug;
 	SssCorrRes	Correlate(uint32_t nid2);
 	void		ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos);
-    void FindSeq(uint32_t *count, uint32_t evenOrOdd);
+    searchRes FindSeq(uint32_t *count, uint32_t evenOrOdd);
 };
 
 
