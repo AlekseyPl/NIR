@@ -34,12 +34,17 @@ int main(int argc, char *argv[])
 	std::shared_ptr<Lte::LteCorrelator> correlator = std::make_shared<Lte::LteCorrelator>();
 	assert( correlator );
 
-	in.read( reinterpret_cast<char*>(corrData.data()), corrSize * sizeof( Complex16 ) );
-	in.seekg( 0, in.beg );
+    in.read( reinterpret_cast<char*>(corrData.data()), corrSize * sizeof( Complex16 ) );
+    in.seekg( 0, in.beg );
+
+//    in.seekg( Lte::LTEFrameLength/2 * sizeof(Complex16)/2, in.beg);
+
+//    in.read( reinterpret_cast<char*>(corrData.data()), corrSize * sizeof( Complex16 ) );
+//    in.seekg( 0, in.beg );
 
 	const float corrThreshold = 0.5;
 	const uint32_t searchDepth = 5;
-	const uint32_t decimFactor = 16;
+    const uint32_t decimFactor = 16;
 	const uint32_t numChannels = 1;
 
 	correlator->SetThreshold( corrThreshold );

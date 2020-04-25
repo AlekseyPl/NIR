@@ -25,6 +25,7 @@ public:
 
 	static const int32_t PSS_COUNT = LTENid2Max + 1;
 	static const int32_t SSS_COUNT = LTENid1Max + 1;
+    int32_t sssLengthCorr = 64;
 
 	SyncCode( );
 	virtual ~SyncCode( ) {}
@@ -73,6 +74,7 @@ public:
 
     };
 
+
     /*enum SpecCode {
         sssS0m0  = 0,
         sssS0m8  = 1,
@@ -84,7 +86,7 @@ public:
     };*/
 
 	std::vector< ComplexFloat >& 	GetCode( int32_t nid1, int32_t nid2, int32_t num );
-    std::array<std::vector< ComplexFloat >, 3> &	GetSpecCode(SecondarySyncCode::SpecCode code);
+    std::array<std::vector< ComplexFloat >, 7> &	GetSpecCode(SecondarySyncCode::SpecCode code);
 
 	float						 	GetAmp( int32_t nid1, int32_t nid2, int32_t num );
 
@@ -107,14 +109,14 @@ private:
 	std::vector< int32_t >		zt;
 
 
-	Math::FftSP					fft32;
+    Math::FftSP					fft64;
 
     //std::vector< ComplexFloat>	sssSpectrs[SSS_SPEC_COUNT];
 
 //    std::vector< ComplexFloat>  sssSpectrsS0mX[3];
 //    std::vector<ComplexFloat>   sssSpectrsS1mX[3];
-    std::array<std::vector< ComplexFloat >, 3> 	sssSpectrsS0mX;
-    std::array<std::vector< ComplexFloat >, 3> 	sssSpectrsS1mX;
+    std::array<std::vector< ComplexFloat >, 7> 	sssSpectrsS0mX;
+    std::array<std::vector< ComplexFloat >, 7> 	sssSpectrsS1mX;
 
 	void	Generate( );
 	void	GenerateV2( );

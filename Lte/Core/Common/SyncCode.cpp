@@ -94,13 +94,13 @@ float PrimarySyncCode::GetAmp( uint32_t nid2 )
 }
 
 SecondarySyncCode::SecondarySyncCode( bool isFreqSearch ):
-	fft32(LTESyncCodeHalfLen+1)
+    fft64(sssLengthCorr)
 {
     if( isFreqSearch ) {
-        for (uint32_t i = 0; i < 3; ++i) {
+        for (uint32_t i = 0; i < 7; ++i) {
             //sssSpectrs[i].resize(LTESyncCodeHalfLen+1);
-            sssSpectrsS0mX[i].resize(LTESyncCodeHalfLen+1);
-            sssSpectrsS1mX[i].resize(LTESyncCodeHalfLen+1);
+            sssSpectrsS0mX[i].resize(sssLengthCorr);
+            sssSpectrsS1mX[i].resize(sssLengthCorr);
         }
 
 
@@ -119,59 +119,84 @@ SecondarySyncCode::SecondarySyncCode( bool isFreqSearch ):
 
 void SecondarySyncCode::GenerateV2()
 {
-	GenerateM0M1( );
-	GenerateSt( );
-	GenerateCt( );
-	GenerateZt( );
+    GenerateM0M1( );
+    GenerateSt( );
+    GenerateCt( );
+    GenerateZt( );
 
-	int32_t nid1 = 0;
-    ComplexFloat s0m0 [ LTESyncCodeHalfLen+1 ];
-    ComplexFloat s0m8 [ LTESyncCodeHalfLen+1 ];
-    ComplexFloat s0m16[ LTESyncCodeHalfLen+1 ];
+    int32_t nid1 = 0;
+    ComplexFloat s0m0 [ sssLengthCorr ];
+    ComplexFloat s0m5 [ sssLengthCorr ];
+    ComplexFloat s0m10[ sssLengthCorr ];
+    ComplexFloat s0m15[ sssLengthCorr ];
+    ComplexFloat s0m20[ sssLengthCorr ];
+    ComplexFloat s0m25[ sssLengthCorr ];
+    ComplexFloat s0m30[ sssLengthCorr ];
 
-
-
-	ComplexFloat s1m1[ LTESyncCodeHalfLen+1 ];
-    ComplexFloat s1m9[ LTESyncCodeHalfLen+1 ];
-    ComplexFloat s1m17[ LTESyncCodeHalfLen+1 ];
-
-
-	int32_t m0 = m0Val[ nid1 ];
-	int32_t m1 = m1Val[ nid1 ];
-	for( uint32_t i = 0; i < LTESyncCodeHalfLen; ++i ) {
-        s0m0    [ i ] = ComplexFloat(st[ (i + m0)      % LTESyncCodeHalfLen ], 0);
-        s0m8    [ i ] = ComplexFloat(st[ (i + m0 + 8)  % LTESyncCodeHalfLen ], 0);
-        s0m16   [ i ] = ComplexFloat(st[ (i + m0 + 16) % LTESyncCodeHalfLen ], 0);
+    ComplexFloat s1m0 [ sssLengthCorr ];
+    ComplexFloat s1m5 [ sssLengthCorr ];
+    ComplexFloat s1m10[ sssLengthCorr ];
+    ComplexFloat s1m15[ sssLengthCorr ];
+    ComplexFloat s1m20[ sssLengthCorr ];
+    ComplexFloat s1m25[ sssLengthCorr ];
+    ComplexFloat s1m30[ sssLengthCorr ];
 
 
-        s1m1[ i ] =  ComplexFloat(st[ ( i + m1)       % LTESyncCodeHalfLen ], 0);
-        s1m9[ i ] =  ComplexFloat(st[ ( i + m1 + 8)   % LTESyncCodeHalfLen ], 0);
-        s1m17[ i ]=  ComplexFloat(st[ ( i + m1 + 16)  % LTESyncCodeHalfLen ], 0);
-	}
-	s0m0[LTESyncCodeHalfLen]=ComplexFloat(0,0);
-    s0m8[LTESyncCodeHalfLen]=ComplexFloat(0,0);
-    s0m16[LTESyncCodeHalfLen]=ComplexFloat(0,0);
-
-	s1m1[LTESyncCodeHalfLen]=ComplexFloat(0,0);
-    s1m9[LTESyncCodeHalfLen]=ComplexFloat(0,0);
-    s1m17[LTESyncCodeHalfLen]=ComplexFloat(0,0);
-
-    std::vector <ComplexFloat> s0m01;
-
-    s0m01.assign(s0m0, s0m0 + LTESyncCodeHalfLen);
-
-    std::ofstream output("/home/stepan/matlab_scripts/s0m0.dat", std::ios::binary);
-    output.write(reinterpret_cast<char*>(s0m01.data()), s0m01.size() * sizeof(s0m01[0]));
-    output.close();
 
 
-    fft32.DoIt(s0m0,  sssSpectrsS0mX[0].data());
-    fft32.DoIt(s0m8,  sssSpectrsS0mX[1].data());
-    fft32.DoIt(s0m16, sssSpectrsS0mX[2].data());
+    int32_t m0 = m0Val[ nid1 ];
+    int32_t m1 = m1Val[ nid1 ];
 
-    fft32.DoIt(s1m1,  sssSpectrsS1mX[0].data());
-    fft32.DoIt(s1m9,  sssSpectrsS1mX[1].data());
-    fft32.DoIt(s1m17, sssSpectrsS1mX[2].data());
+    for( uint32_t i = 0; i < LTESyncCodeHalfLen; ++i ) {
+        s0m0    [ i ] = ComplexFloat(st[ (i + m0 + 0)  % LTESyncCodeHalfLen ], 0);
+        s0m5    [ i ] = ComplexFloat(st[ (i + m0 + 5)  % LTESyncCodeHalfLen ], 0);
+        s0m10   [ i ] = ComplexFloat(st[ (i + m0 + 10) % LTESyncCodeHalfLen ], 0);
+        s0m15   [ i ] = ComplexFloat(st[ (i + m0 + 15) % LTESyncCodeHalfLen ], 0);
+        s0m20   [ i ] = ComplexFloat(st[ (i + m0 + 20) % LTESyncCodeHalfLen ], 0);
+        s0m25   [ i ] = ComplexFloat(st[ (i + m0 + 25) % LTESyncCodeHalfLen ], 0);
+        s0m30   [ i ] = ComplexFloat(st[ (i + m0 + 30) % LTESyncCodeHalfLen ], 0);
+
+        s1m0[ i ] =  ComplexFloat(st[ ( i + m1 + 0)   % LTESyncCodeHalfLen ], 0);
+        s1m5[ i ] =  ComplexFloat(st[ ( i + m1 + 5)   % LTESyncCodeHalfLen ], 0);
+        s1m10[ i ]=  ComplexFloat(st[ ( i + m1 + 10)  % LTESyncCodeHalfLen ], 0);
+        s1m15[ i ]=  ComplexFloat(st[ ( i + m1 + 15)  % LTESyncCodeHalfLen ], 0);
+        s1m20[ i ]=  ComplexFloat(st[ ( i + m1 + 20)  % LTESyncCodeHalfLen ], 0);
+        s1m25[ i ]=  ComplexFloat(st[ ( i + m1 + 25)  % LTESyncCodeHalfLen ], 0);
+        s1m30[ i ]=  ComplexFloat(st[ ( i + m1 + 30)  % LTESyncCodeHalfLen ], 0);
+    }
+//    s0m0[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s0m5[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s0m10[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s0m15[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s0m20[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s0m25[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s0m30[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+
+
+//    s1m0[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s1m5[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s1m10[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s1m15[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s1m20[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s1m25[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+//    s1m30[LTESyncCodeHalfLen]=ComplexFloat(0,0);
+
+    fft64.DoIt(s0m0,  sssSpectrsS0mX[0].data());
+    fft64.DoIt(s0m5,  sssSpectrsS0mX[1].data());
+    fft64.DoIt(s0m10, sssSpectrsS0mX[2].data());
+    fft64.DoIt(s0m15, sssSpectrsS0mX[3].data());
+    fft64.DoIt(s0m20, sssSpectrsS0mX[4].data());
+    fft64.DoIt(s0m25, sssSpectrsS0mX[5].data());
+    fft64.DoIt(s0m30, sssSpectrsS0mX[6].data());
+
+    fft64.DoIt(s1m0,  sssSpectrsS1mX[0].data());
+    fft64.DoIt(s1m5,  sssSpectrsS1mX[1].data());
+    fft64.DoIt(s1m10, sssSpectrsS1mX[2].data());
+    fft64.DoIt(s1m15, sssSpectrsS1mX[3].data());
+    fft64.DoIt(s1m20, sssSpectrsS1mX[4].data());
+    fft64.DoIt(s1m25, sssSpectrsS1mX[5].data());
+    fft64.DoIt(s1m30, sssSpectrsS1mX[6].data());
+
 
 }
 
@@ -370,7 +395,7 @@ float SecondarySyncCode::GetAmp( int32_t nid1, int32_t nid2, int32_t num )
 	return ( num == 0 ) ? amp0[ nid2 ][ nid1 ] : amp1[ nid2 ][ nid1 ];
 }
 
-std::array<std::vector< ComplexFloat >, 3> & SecondarySyncCode::GetSpecCode(SecondarySyncCode::SpecCode code)
+std::array<std::vector< ComplexFloat >, 7> & SecondarySyncCode::GetSpecCode(SecondarySyncCode::SpecCode code)
 {
     switch(code) {
     case SecondarySyncCode::sss0Even:

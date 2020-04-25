@@ -6,7 +6,7 @@
 #include <Math/FftSP.h>
 #include <Common/SyncCode.h>
 #include <array>
-
+#include <iostream>
 namespace System {
 	class DebugInfo;
 }
@@ -47,13 +47,13 @@ public:
 	SearchResult	Do(const ComplexFloat* data, uint32_t nid2, uint32_t pssPos);
     uint32_t GetPssOffsetFrame(CyclicPrefix cp, Duplex dx);
 private:
-	static const uint32_t SssFftCorrLen = 32;
+    static const uint32_t SssFftCorrLen = 64;
 	static const uint32_t DecimFactor = 16;
 	static const uint32_t CorrCount = LTEFrameLength / DecimFactor;
 
     static const uint32_t VariantsCount = 6;
 	static const uint32_t SssPartsCount = 4;
-    static const uint32_t ResultAmount = 3;
+    static const uint32_t ResultAmount = 7;
 
 	struct 	SearchParams {
 		int32_t			shiftPssToSss;
@@ -84,7 +84,7 @@ private:
     searchRes                   est_m;
 
 	std::vector<SearchParams>	searchParams;
-    Math::FftSP					fft32;
+    Math::FftSP					fft64;
 	Math::FftSP					fft128;
 
 
@@ -121,12 +121,13 @@ private:
 
 inline uint32_t SssCorrelator::CalcM0(uint32_t pos)
 {
-    return SssFftCorrLen - pos;
+    std::cout<<"";
+    return (SssFftCorrLen - pos*2)% SssFftCorrLen/2;
 }
 
 inline uint32_t SssCorrelator::CalcM1(uint32_t pos)
 {
-	return (SssFftCorrLen - pos + 1) % SssFftCorrLen; // look at 36211. Table 6.11.2.1-1
+    return (SssFftCorrLen - pos*2 + 2) % SssFftCorrLen/2; // look at 36211. Table 6.11.2.1-1
 }
 
 }
