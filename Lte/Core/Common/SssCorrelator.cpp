@@ -65,63 +65,58 @@ SssCorrelator::SearchResult	SssCorrelator::Do(const ComplexFloat* data, uint32_t
 
 SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
 {
-    SssCorrRes corr[2];
-    corr[0].subframeNum = 0;
-    corr[1].subframeNum = 5;
+    SssCorrRes corr;
 
-    for( uint32_t count = 0; count < 2; ++count ) {
 
-        searchRes temp1;
-        searchRes temp2;
-        uint32_t genParamM;
+    searchRes temp1;
+    searchRes temp2;
+    uint32_t genParamM;
 
-        auto evenPart = sssParts[2*count].data();
-        sss.DemodCt(evenPart, nid2);
-        fft64.DoIt(evenPart,sssSpectrumPart.data());
-        auto tempForNormalizeEven = sssSpectrumPart;
-        float32 accumResultEven;
+    auto evenPart = sssParts[0].data();
+    sss.DemodCt(evenPart, nid2);
+    fft64.DoIt(evenPart,sssSpectrumPart.data());
+    auto tempForNormalizeEven = sssSpectrumPart;
+    float32 accumResultEven;
 
 
 
 
-        for (uint32_t i = 0; i < tempForNormalizeEven.size(); ++i) {
-            accumResultEven = accumResultEven + abs2(tempForNormalizeEven[i]);
-        }
-
-        accumResultEven = Math::Sqrt(accumResultEven);
-
-        temp1 =  FindSeq(&count, 0);
-        if (count == 0) {
-            corr[count].M0 = CalcM0( temp1.place);
-            genParamM = corr[count].M0;
-        }
-        else {
-            corr[count].M1 = CalcM1( temp1.place  + 1);
-            genParamM = corr[count].M1;
-        }
-
-        auto oddPart  = sssParts[2*count+1].data();
-        sss.DemodCtZt(oddPart,nid2,genParamM);
-        fft64.DoIt(oddPart,sssSpectrumPart.data());
-        auto tempForNormalizeOdd = sssSpectrumPart;
-
-        float32 accumResultOdd;
-        for (uint32_t i = 0; i < tempForNormalizeOdd.size(); ++i) {
-            accumResultOdd = accumResultOdd + abs2(tempForNormalizeOdd[i]);
-        }
-        accumResultOdd = Math::Sqrt(accumResultOdd);
-
-        temp2 =  FindSeq(&count, 1);
-        if (count == 0) corr[count].M1 = CalcM1( temp2.place );
-        else            corr[count].M0 = CalcM0( temp2.place - 1 );
-
-        if (corr[count].M0>corr[count].M1) {temp1.val = 0; temp2.val = 0;}
-
-
-
-        corr[count].corrRes = Math::Div((temp1.val+temp2.val),accumResultEven*accumResultOdd);
+    for (uint32_t i = 0; i < tempForNormalizeEven.size(); ++i) {
+        accumResultEven = accumResultEven + abs2(tempForNormalizeEven[i]);
     }
-    return std::max(corr[0],corr[1]);
+
+    accumResultEven = Math::Sqrt(accumResultEven);
+
+    temp1 =  FindSeq(0);
+
+    corr.M0 = CalcM0( temp1.place);
+
+    auto oddPart  = sssParts[1].data();
+    sss.DemodCtZt(oddPart,nid2,corr.M0);
+    fft64.DoIt(oddPart,sssSpectrumPart.data());
+    auto tempForNormalizeOdd = sssSpectrumPart;
+
+    float32 accumResultOdd;
+    for (uint32_t i = 0; i < tempForNormalizeOdd.size(); ++i) {
+        accumResultOdd = accumResultOdd + abs2(tempForNormalizeOdd[i]);
+    }
+    accumResultOdd = Math::Sqrt(accumResultOdd);
+
+    temp2 =  FindSeq(1);
+    corr.M1 = CalcM1(temp2.place );
+
+    if (corr.M0>corr.M1) {
+        auto temp1 = corr.M1;
+        corr.M1 =  corr.M0;
+        corr.M0 = temp1;
+        corr.subframeNum = 5;
+    }
+    else         corr.subframeNum = 0;
+
+
+    corr.corrRes = Math::Div((temp1.val+temp2.val),accumResultEven*accumResultOdd);
+
+    return corr;
 }
 void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos)
 {
@@ -204,12 +199,12 @@ uint32_t SssCorrelator::GetPssOffsetFrame(CyclicPrefix cp, Duplex dx)
     return offset;
 }
 
-SssCorrelator::searchRes SssCorrelator::FindSeq(uint32_t* count, uint32_t evenOrOdd)
+SssCorrelator::searchRes SssCorrelator::FindSeq( uint32_t evenOrOdd)
 {
     searchRes ResultSpot;
     std::vector <searchRes> resultNum(ResultAmount);
     for (int i = 0; i < ResultAmount; ++i) {
-        auto& code = sss.GetSpecCode(sssCode[2* *count + evenOrOdd]);
+        auto& code = sss.GetSpecCode(sssCode[evenOrOdd]);
         for( auto sIt = sssSpectrumPart.begin(), cIt = code[i].begin(),
              fIt = fftCorrRes[i].begin();        sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
             *fIt = conj_mpy(*sIt,*cIt);

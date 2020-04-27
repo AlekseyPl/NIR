@@ -115,7 +115,7 @@ private:
 	System::DebugInfo&	debug;
 	SssCorrRes	Correlate(uint32_t nid2);
 	void		ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos);
-    searchRes FindSeq(uint32_t *count, uint32_t evenOrOdd);
+    searchRes FindSeq(uint32_t evenOrOdd);
 };
 
 

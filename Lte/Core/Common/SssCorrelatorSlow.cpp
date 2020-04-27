@@ -41,9 +41,7 @@ SssCorrelator::SearchResult SssCorrelator::Do(const ComplexFloat *data, uint32_t
 			corrMax = ret.corrMax;
 			offset = p.shiftToFramePos;
 		}
-
 	}
-
 	return SearchResult(resNid1, offset, sfNum, cp,dx );
 }
 
@@ -116,6 +114,7 @@ void SssCorrelator::ExtractSymbolSss(const ComplexFloat *data, const SearchParam
 
 	sssRxAmp = std::accumulate( sssSignal.begin(),sssSignal.end(),0.0f, [](float acc, ComplexFloat val)
 						  { return acc + abs2(val);});
+
 
 	sssRxAmp = Math::Sqrt(sssRxAmp);
 }
