@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+//#include <>
 
 namespace Lte {
 
@@ -77,6 +78,18 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
         auto evenPart = sssParts[2*count].data();
         sss.DemodCt(evenPart, nid2);
         fft64.DoIt(evenPart,sssSpectrumPart.data());
+        auto tempForNormalizeEven = sssSpectrumPart;
+        float32 accumResultEven;
+
+
+
+
+        for (uint32_t i = 0; i < tempForNormalizeEven.size(); ++i) {
+            accumResultEven = accumResultEven + abs2(tempForNormalizeEven[i]);
+        }
+
+        accumResultEven = Math::Sqrt(accumResultEven);
+
         temp1 =  FindSeq(&count, 0);
         if (count == 0) {
             corr[count].M0 = CalcM0( temp1.place);
@@ -90,18 +103,23 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
         auto oddPart  = sssParts[2*count+1].data();
         sss.DemodCtZt(oddPart,nid2,genParamM);
         fft64.DoIt(oddPart,sssSpectrumPart.data());
+        auto tempForNormalizeOdd = sssSpectrumPart;
+
+        float32 accumResultOdd;
+        for (uint32_t i = 0; i < tempForNormalizeOdd.size(); ++i) {
+            accumResultOdd = accumResultOdd + abs2(tempForNormalizeOdd[i]);
+        }
+        accumResultOdd = Math::Sqrt(accumResultOdd);
+
         temp2 =  FindSeq(&count, 1);
         if (count == 0) corr[count].M1 = CalcM1( temp2.place );
         else            corr[count].M0 = CalcM0( temp2.place - 1 );
 
-        if (corr[count].M0>corr[count].M1||corr[count].M0 + 8 <corr[count].M1) {temp1.val = 0; temp2.val = 0;}
+        if (corr[count].M0>corr[count].M1) {temp1.val = 0; temp2.val = 0;}
 
-        corr[count].corrRes = temp1.val+temp2.val;
 
-        auto a = m0m1.GetNid1(M0M1(corr[count].M0, corr[count].M1));
 
-        std::cout<<"";
-
+        corr[count].corrRes = Math::Div((temp1.val+temp2.val),accumResultEven*accumResultOdd);
     }
     return std::max(corr[0],corr[1]);
 }
@@ -196,8 +214,9 @@ SssCorrelator::searchRes SssCorrelator::FindSeq(uint32_t* count, uint32_t evenOr
              fIt = fftCorrRes[i].begin();        sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
             *fIt = conj_mpy(*sIt,*cIt);
         fft64.Undo(fftCorrRes[i].data(),corrRes[i].data());
+
         for (int p =  SssFftCorrLen/2 ; p < SssFftCorrLen ; ) {
-            absCorrRes[p] =  abs(corrRes[i][p]);
+            absCorrRes[p] =  abs2(corrRes[i][p]);
             if (resultNum[i].val<absCorrRes[p]) {
                 resultNum[i].val = absCorrRes[p];
                 resultNum[i].place = (p - i*5)%(SssFftCorrLen/2);
