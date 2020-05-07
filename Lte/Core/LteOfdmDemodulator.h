@@ -33,11 +33,12 @@ public:
         void ProcessSubframe( Complex16* data, uint32_t step );
         void ProcessRefSymb( Complex16* data, uint32_t step );
     void PhaseCorrect (Complex16* data, uint32_t CPType, uint32_t step);
-    void ActionWithCP (uint32_t CPType);
-    void SetConfig (bool DoPhaseCorr, bool DoSwapCP) {
-        this->DoPhaseCorr = DoPhaseCorr; this->DoSwapCP = DoSwapCP;};
+   // void ActionWithCP (uint32_t CPType);
+    inline void SetConfig (bool DoPhaseCorr, bool DoSwapCP) {
+        this->DoPhaseCorr = DoPhaseCorr; this->DoSwapCP = DoSwapCP;}
 private:
 
+        void ActionWithCP (uint32_t CPType);
         const float			maxValue;
 
         CyclicPrefix cyclicPrefix;

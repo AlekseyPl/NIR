@@ -26,7 +26,9 @@ SssCorrelator::SssCorrelator():
     absCorrRes.resize(SssFftCorrLen);
 
 	searchParams.reserve(VariantsCount);
-	sssSpectrumPart.resize(SssFftCorrLen);
+//	sssSpectrumPart.resize(SssFftCorrLen);
+    tempEven.resize(SssFftCorrLen);
+    tempOdd.resize(SssFftCorrLen);
 	sssSignal.resize(SyncCode::FFTLEN);
 	sssSpectrum.resize(SyncCode::FFTLEN);
 
@@ -68,42 +70,42 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
     SssCorrRes corr;
 
 
-    searchRes temp1;
-    searchRes temp2;
-    uint32_t genParamM;
+    searchRes resultEven;
+    searchRes resultOdd;
+
 
     auto evenPart = sssParts[0].data();
     sss.DemodCt(evenPart, nid2);
-    fft64.DoIt(evenPart,sssSpectrumPart.data());
-    auto tempForNormalizeEven = sssSpectrumPart;
-    float32 accumResultEven;
+    fft64.DoIt(evenPart,tempEven.data());
+
+    float32 accumEven;
 
 
 
 
-    for (uint32_t i = 0; i < tempForNormalizeEven.size(); ++i) {
-        accumResultEven = accumResultEven + abs2(tempForNormalizeEven[i]);
+    for (uint32_t i = 0; i < tempEven.size(); ++i) {
+        accumEven = accumEven + abs2(tempEven[i]);
     }
 
-    accumResultEven = Math::Sqrt(accumResultEven);
+    accumEven = Math::Sqrt(accumEven);
 
-    temp1 =  FindSeq(0);
+    resultEven =  FindSeq(tempEven, 0);
 
-    corr.M0 = CalcM0( temp1.place);
+    corr.M0 = CalcM0( resultEven.place);
 
     auto oddPart  = sssParts[1].data();
     sss.DemodCtZt(oddPart,nid2,corr.M0);
-    fft64.DoIt(oddPart,sssSpectrumPart.data());
-    auto tempForNormalizeOdd = sssSpectrumPart;
+    fft64.DoIt(oddPart,tempOdd.data());
 
-    float32 accumResultOdd;
-    for (uint32_t i = 0; i < tempForNormalizeOdd.size(); ++i) {
-        accumResultOdd = accumResultOdd + abs2(tempForNormalizeOdd[i]);
+
+    float32 accumOdd;
+    for (uint32_t i = 0; i < tempOdd.size(); ++i) {
+        accumOdd = accumOdd + abs2(tempOdd[i]);
     }
-    accumResultOdd = Math::Sqrt(accumResultOdd);
+    accumOdd = Math::Sqrt(accumOdd);
 
-    temp2 =  FindSeq(1);
-    corr.M1 = CalcM1(temp2.place );
+    resultOdd =  FindSeq(tempOdd, 1);
+    corr.M1 = CalcM1(resultOdd.place );
 
     if (corr.M0>corr.M1) {
         auto temp1 = corr.M1;
@@ -114,7 +116,7 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
     else         corr.subframeNum = 0;
 
 
-    corr.corrRes = Math::Div((temp1.val+temp2.val),accumResultEven*accumResultOdd);
+    corr.corrRes = Math::Div((resultEven.val+resultOdd.val),accumEven*accumOdd);
 
     return corr;
 }
@@ -199,14 +201,14 @@ uint32_t SssCorrelator::GetPssOffsetFrame(CyclicPrefix cp, Duplex dx)
     return offset;
 }
 
-SssCorrelator::searchRes SssCorrelator::FindSeq( uint32_t evenOrOdd)
+SssCorrelator::searchRes SssCorrelator::FindSeq(const std::vector<ComplexFloat> &sssSpectrumPart, uint32_t evenOrOdd )
 {
     searchRes ResultSpot;
     std::vector <searchRes> resultNum(ResultAmount);
     for (int i = 0; i < ResultAmount; ++i) {
         auto& code = sss.GetSpecCode(sssCode[evenOrOdd]);
-        for( auto sIt = sssSpectrumPart.begin(), cIt = code[i].begin(),
-             fIt = fftCorrRes[i].begin();        sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
+        auto sIt = sssSpectrumPart.begin();
+        for( auto cIt = code[i].begin(), fIt = fftCorrRes[i].begin(); sIt != sssSpectrumPart.end(); ++sIt, ++cIt, ++fIt)
             *fIt = conj_mpy(*sIt,*cIt);
         fft64.Undo(fftCorrRes[i].data(),corrRes[i].data());
 

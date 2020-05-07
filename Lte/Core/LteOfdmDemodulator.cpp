@@ -60,39 +60,6 @@ void LteOfdmDemod::ProcessSubframe( Complex16* data, uint32_t step )
                     infftData.resize(LTEFFTLen_20_MHz + LTEShortCP0/2);
                     data += step * LTEShortCP0;
                     PhaseCorrect(data, LTEShortCP0, step );
-                    {/*std::vector <ComplexFloat> CP0buffer(LTEShortCP0);
-                    Math::ConvertShortToFloat(data - LTEShortCP0, CP0buffer.data(), (LTEShortCP0), step, 1);
-                    std::ofstream output("/home/stepan/matlab_scripts/1_half_prefix_data.dat", std::ios::binary);
-                    output.write(reinterpret_cast<char*>(CP0buffer.data()), CP0buffer.size () * sizeof(CP0buffer[1]));
-                    output.close();
-                    std::cout<<"1 halfCP"<<std::endl;
-                    std::cout<<"=========================="<<std::endl;
-
-
-
-                    //записываю кусочек символа соответствующий ЦП
-
-
-                    std::vector <ComplexFloat> CP01buffer(LTEShortCP0);
-                    Math::ConvertShortToFloat(data + LTEFFTLen_20_MHz- LTEShortCP0, CP01buffer.data(), (LTEShortCP0), step, 1);
-                    std::ofstream output1("/home/stepan/matlab_scripts/2_half_prefix_data.dat", std::ios::binary);
-                    output1.write(reinterpret_cast<char*>(CP01buffer.data()), CP01buffer.size () * sizeof(CP01buffer[1]));
-                    output1.close();
-                    std::cout<<"2 half CP"<<std::endl;
-                    std::cout<<"=========================="<<std::endl;
-
-
-                    //записываю символ + CP
-
-                    std::vector <ComplexFloat> Symbolbuffer(LTEFFTLen_20_MHz+LTEShortCP0);
-                    Math::ConvertShortToFloat(data - LTEShortCP0, Symbolbuffer.data(), (LTEFFTLen_20_MHz+LTEShortCP0), step, 1);
-                    std::ofstream output2("/home/stepan/matlab_scripts/symbol_data.dat", std::ios::binary);
-                    output2.write(reinterpret_cast<char*>(Symbolbuffer.data()), Symbolbuffer.size () * sizeof(Symbolbuffer[1]));
-
-                    std::cout<<"symbol"<<std::endl;
-                    std::cout<<"=========================="<<std::endl;
-
-                    output2.close();*/}
                     data += (LTEFFTLen_20_MHz) * step;}
 
                 else {
@@ -109,7 +76,7 @@ void LteOfdmDemod::ProcessSubframe( Complex16* data, uint32_t step )
                 }
 
             outfftData.assign(outfftData.size(), ComplexFloat{0,0});
-            fft.DoIt( infftData.data(), outfftData.data() );//БПФ входных данных
+            fft.DoIt( infftData.data(), outfftData.data() );
 
             std::copy( outfftData.begin()+LTEFFTLen_20_MHz/2, outfftData.end(),std::back_inserter(buffer));
             std::copy( outfftData.begin()+1,outfftData.begin() + LTEFFTLen_20_MHz/2, std::back_inserter(buffer));
@@ -121,35 +88,7 @@ void LteOfdmDemod::ProcessSubframe( Complex16* data, uint32_t step )
     Normalize();
 
 }
-/*void LteOfdmDemod::ProcessSubframe( Complex16* data, uint32_t step )
-{
-        buffer.clear();
-        for( uint32_t slot = 0; slot < LTESlotsInSubframe; ++slot ) {
-                for( uint32_t sym = 0; sym < symbolCount; ++sym ) {
-                        if( cyclicPrefix == lteCP_Short )
-                                if( sym == 0 )  data += step * LTEShortCP0;
-                                else 			data += step * LTEShortCPX;
-                        else data += step * LTELongCP;
-
-                        infftData.assign(outfftData.size(), ComplexFloat{0,0});
-                        Math::ConvertShortToFloat(data, infftData.data(), LTEFFTLen_20_MHz, step, 1);
-
-
-                        outfftData.assign(outfftData.size(), ComplexFloat{0,0});
-                        fft.DoIt( infftData.data(), outfftData.data() );
-
-                        std::copy( outfftData.begin()+LTEFFTLen_20_MHz/2, outfftData.end(),std::back_inserter(buffer));
-                        std::copy( outfftData.begin()+1,outfftData.begin() + LTEFFTLen_20_MHz/2, std::back_inserter(buffer));
-                        buffer.push_back( ComplexFloat( 0.0, 0.0 ) ); // because we delete " 0 " subcarrier
-
-                        data += LTEFFTLen_20_MHz * step;
-                }
-        }
-        Normalize();
-}
-*/
-void	LteOfdmDemod::ProcessRefSymb( Complex16* data, uint32_t step )
-{
+void	LteOfdmDemod::ProcessRefSymb( Complex16* data, uint32_t step ){
         buffer.clear();
         for( uint32_t slot = 0; slot < LTESlotsInSubframe; ++slot ) {
                 for( uint32_t sym = 0; sym < symbolCount; ++sym ) {
@@ -173,8 +112,7 @@ void	LteOfdmDemod::ProcessRefSymb( Complex16* data, uint32_t step )
         Normalize();
 }
 
-void LteOfdmDemod::Normalize()
-{
+void LteOfdmDemod::Normalize(){
         float maxamp = 0.0;
         for(const auto& b : buffer ) {
                 float curramp = abs(b);
@@ -224,7 +162,7 @@ void LteOfdmDemod::PhaseCorrect(Complex16* data, uint32_t CPType, uint32_t step 
     }
 void LteOfdmDemod::ActionWithCP(uint32_t CPType)
 {
-    if ((DoSwapCP&&DoPhaseCorr)||(DoSwapCP&&!DoPhaseCorr))
+    if ((DoSwapCP && DoPhaseCorr)||(DoSwapCP && !DoPhaseCorr))
     {
         std::copy      (infftData.begin(), infftData.begin() +  CPType/2, (infftData.begin()+LTEFFTLen_20_MHz));
         infftData.erase(infftData.begin(), infftData.begin() +  CPType/2);

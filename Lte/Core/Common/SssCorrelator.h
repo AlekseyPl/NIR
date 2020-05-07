@@ -100,7 +100,9 @@ private:
 	std::vector<ComplexFloat>	sssSpectrum;
     std::array <std::vector<ComplexFloat>, SssPartsCount>	sssParts;
 
-	std::vector<ComplexFloat>	sssSpectrumPart;
+//	std::vector<ComplexFloat>	sssSpectrumPart;
+    std::vector<ComplexFloat>   tempEven;
+    std::vector<ComplexFloat>   tempOdd;
 
 	SecondarySyncCode			sss;
 	M0M1Converter				m0m1;
@@ -115,7 +117,7 @@ private:
 	System::DebugInfo&	debug;
 	SssCorrRes	Correlate(uint32_t nid2);
 	void		ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos);
-    searchRes FindSeq(uint32_t evenOrOdd);
+    searchRes FindSeq(const std::vector<ComplexFloat> &sssSpectrumPart, uint32_t evenOrOdd);
 };
 
 
