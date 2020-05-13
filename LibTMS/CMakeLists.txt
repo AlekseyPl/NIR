@@ -18,4 +18,4 @@ add_subdirectory(System)
 
 add_library(LibTMS INTERFACE)
 
-target_link_libraries(LibTMS INTERFACE math system)
+target_link_libraries(LibTMS INTERFACE math system fftw3 fftw3f)

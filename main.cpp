@@ -1,12 +1,11 @@
 #include <stdint.h>
 
 #include <Math/IntComplex.h>
-#include <Lte/Core/LteCorrelator.h>
-#include <Lte/Core/Common/LteConst.h>
-#include <Lte/Core/Common/LteDemConst.h>
-
-#include "Lte/Core/LteStream.h"
-#include "Lte/Core/LteOfdmDemodulator.h"
+#include <Lte/Core/Correlator/LteCorrelator.h>
+#include <Lte/Core/Support/LteConst.h>
+#include <Lte/Core/Support/LteDemConst.h>
+#include <Lte/Core/Ofdm/LteOfdmDemodulator.h>
+#include <Lte/Core/LteStream.h>
 
 #include <stdio.h>
 #include <iostream>
@@ -99,7 +98,7 @@ int main(int argc, char *argv[])
 				in.seekg( 9 * Lte::LTESubframeLength * sizeof( Complex16 ), in.cur );
                 //void SetConfig (bool DoPhaseCorr, bool DoSwapCP) {this->DoPhaseCorr = DoPhaseCorr; this->DoSwapCP = DoSwapCP;};
 
-                demodulator->SetConfig(true,true);
+//                demodulator->SetConfig(true,true);
 
 				demodulator->ProcessSubframe(sfBuffer.data(), numChannels);
 				auto& ofdmSymbols = demodulator->GetSymbols();

@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 project(math CXX C ASM)
+set(LIB_TARGET ${PROJECT_NAME})
 
 set(SOURCES
 ./ComplexMath.cpp
 ./DSPF_sp_fftSPxSP_cn.cpp
 ./DSPF_sp_ifftSPxSP_cn.cpp
 ./FftSP.cpp
+./Fftwf.cpp
 ./Peak.cpp
 ./Util.cpp
 ./C6xSim/C6xSimulator.c
@@ -22,6 +24,7 @@ set(HEADERS
 ./FftSP.h
 ./Peak.h
 ./Util.h
+./Fftwf.h
 ./C6xSim/c66_ag_intrins.h
 ./C6xSim/c66_conversion_macros.h
 ./C6xSim/c66_data_sim.h
@@ -37,4 +40,6 @@ add_library(math STATIC ${SOURCES} ${HEADERS})
 target_include_directories(math
 	PUBLIC ../)
 
+target_link_libraries(${LIB_TARGET}
+	fftw3f )
 
