@@ -84,20 +84,19 @@ void LteCorrelator::CalcSyncCorr( const ComplexFloat* data )
 	uint32_t resNid2 = 0;
 	for( uint32_t nid2 = 0; nid2 < SyncCode::PSS_COUNT; ++nid2 ) {
 
-		auto pssRes = pssCorrelator->GetCorrMaxPos(nid2);
+        auto pssRes = pssCorrelator->GetCorrMaxPos(resNid2);
 
-		resNid2 = nid2;
 		pssPos = pssRes.pos;
 		pssMax = pssRes.val;
-
 		debug.SendText("Nid2 %d :PssCorrMax %f, pssPos %d, trh %f", resNid2, pssMax, pssPos, threshold);
 		if( pssMax < threshold ) continue; // stop if corrMax < threshold
-
-//		auto searchRes = sssCorrelatorSlow->Do(data, resNid2, pssPos);
-		auto searchRes = sssCorrelator->Do(data, resNid2, pssPos);
+        //auto searchRes = sssCorrelatorSlow->Do(data, resNid2, pssPos);
+       auto searchRes = sssCorrelator->Do(data, resNid2, pssPos);
 		if(searchRes.nid1 == -1) continue;
 		nCellId = GetResNid(searchRes.nid1, resNid2);
 		framePos = (pssPos*decimFactor - searchRes.shiftToFrame - searchRes.subframeNum * LTESubframeLength + LTEFrameLength)%LTEFrameLength ;
+
+        pssCorrelator->ClearCorr(resNid2, pssPos, 16);
 
 		debug.SendText("Nid1 %d : FramePos %d, nCellId %d, sfNum %d", searchRes.nid1, framePos, nCellId, searchRes.subframeNum);
 		CellInfo cell;
@@ -126,6 +125,7 @@ void LteCorrelator::CalcSyncCorr( const ComplexFloat* data, const CellInfo& cell
 {
 	uint32_t nid1 = cellInfo.nCellId / 3;
 	uint32_t nid2 = cellInfo.nCellId % 3;
+
 
 	pssCorrelator->Correlate(data, nid2);
 	auto res = pssCorrelator->GetCorrMaxPos(nid2);

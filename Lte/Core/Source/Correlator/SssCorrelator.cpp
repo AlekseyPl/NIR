@@ -101,10 +101,7 @@ SssCorrelator::SssCorrRes	SssCorrelator::Correlate( uint32_t nid2 )
     }
     else   corr.subframeNum = 0;
 
-
-// Верно ли это? Почему так корреляция складывается, а не например even/AcumEven + odd/AccumOdd
-    corr.corrRes = Math::Div((resultEven.val+resultOdd.val),accumEven*accumOdd);
-//    corr.corrRes = Math::Div(resultEven.val,accumEven)+Math::Div(resultOdd.val,accumOdd);
+    corr.corrRes = Math::Div(resultEven.val,accumEven)+Math::Div(resultOdd.val,accumOdd);
     return corr;
 }
 void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParams& params, uint32_t pssPos)
@@ -133,15 +130,14 @@ void	SssCorrelator::ExtractSignalSss(const ComplexFloat* data, const SearchParam
     for( uint32_t i = startPos1; i < endPos1+1; i+=2 )
         *oddPart++ = sssSignal[i];
 
-    sssParts[2].assign(sssParts[0].begin(), sssParts[0].end()); // for SSS0 and SSS1 correlating
-    sssParts[3].assign(sssParts[1].begin(), sssParts[1].end());
+
 }
 
 SssCorrelator::searchRes SssCorrelator::FindSeq(const std::vector<ComplexFloat> &sssSpectrumPart, uint32_t evenOrOdd )
 {
 	searchRes ResultSpot;
 	auto conjmpy = [] (ComplexFloat val1, ComplexFloat val2) { return conj_mpy(val1, val2);};
-	auto calcAmp = [] (ComplexFloat val) { return abs(val);};
+    auto calcAmp = [] (ComplexFloat val) { return abs(val);};
 	auto& code = sss.GetSpecCode(sssCode[evenOrOdd]);
 	std::transform(sssSpectrumPart.begin(), sssSpectrumPart.end(), code.begin(), fftCorrRes.begin(), conjmpy);
 	Math::Fftwf::Do(Math::Fftwf::Params(fftCorrRes.data(), corrRes.data(), fftCorrRes.size(), Math::Fftwf::dirBackward));

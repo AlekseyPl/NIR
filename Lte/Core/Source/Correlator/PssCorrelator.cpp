@@ -1,10 +1,10 @@
-#include "Correlator/PssCorrelator.h"
+﻿#include "Correlator/PssCorrelator.h"
 #include <Math/FftSP.h>
 #include <cstring>
 #include <algorithm>
 #include <numeric>
 #include <System/DebugInfo.h>
-
+#include <fstream>
 namespace Lte {
 
 PssCorrelator::PssCorrelator(uint32_t corrSize):
@@ -31,14 +31,34 @@ PssCorrelator::PssCorrelator(uint32_t corrSize):
 	sigAmps.resize(corrSize + SyncCode::FFTLEN);
 }
 
-const PssCorrelator::PssRes PssCorrelator::GetCorrMaxPos(uint32_t nid2)
+const PssCorrelator::PssRes PssCorrelator::GetCorrMaxPos(uint32_t& resNid2)
 {
-	PssRes res;
-	auto maxEl = std::max_element(absCorr.at(nid2).begin(), absCorr.at(nid2).end());
-	res.val = *maxEl;
-	res.pos = std::distance(absCorr.at(nid2).begin(), maxEl);
+    PssRes res;
+
+    float pssMax = 0;
+    for( uint32_t nid2 = 0 ; nid2 < SyncCode::PSS_COUNT; ++nid2 ) {
+        auto maxptr = max_element( absCorr.at(nid2).begin(), absCorr.at(nid2).end() );
+        if( *maxptr > pssMax ) {
+            res.val = *maxptr;
+            resNid2 = nid2;
+            res.pos = std::distance(absCorr.at(nid2).begin(), maxptr);
+        }
+    }
+
 
 	return res;
+}
+void PssCorrelator::ClearCorr(const uint32_t &resNid2,const uint32_t &pos, int32_t deltaPos)
+{
+    int32_t startPos = pos - deltaPos;
+     if( startPos < 0 ) startPos = 0;
+
+     int32_t stopPos = pos + deltaPos;
+     if( stopPos >= corrSize ) stopPos = corrSize - 1;
+
+
+
+     memset( absCorr.at(resNid2).data() + startPos, 0, ( stopPos - startPos ) * sizeof( float ) );
 }
 
 void PssCorrelator::Correlate( const ComplexFloat *sig, uint32_t nid2 )

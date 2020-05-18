@@ -186,7 +186,7 @@ ComplexFloat	Equalizer::Hdelta( ComplexFloat s1, ComplexFloat s2, float step)
 void Equalizer::Alamouti2x1( const ComplexFloat& x1, const ComplexFloat& x2, const ComplexFloat& h1,
 							 const ComplexFloat& h2, ComplexFloat& r1, ComplexFloat& r2 )
 {
-	float div = Math::Div( abs( h1 ) + abs( h2 ) , 2.0);
+    float div = Math::Div( float(abs( h1 ) + abs( h2 )) , (float)2.0);
 
 	if( div > 0 ) {
 		// alamouti

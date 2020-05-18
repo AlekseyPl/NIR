@@ -51,7 +51,7 @@ private:
 	static const uint32_t CorrCount = LTEFrameLength / DecimFactor;
 
     static const uint32_t VariantsCount = 6;
-    static const uint32_t SssPartsCount = 4;
+    static const uint32_t SssPartsCount = 2;
 
 	struct 	SearchParams {
 		int32_t			shiftPssToSss;
@@ -119,12 +119,13 @@ private:
 
 inline uint32_t SssCorrelator::CalcM0(uint32_t pos)
 {
+    //return (LTESyncCodeHalfLen - pos);
     return (LTESyncCodeHalfLen - pos);
 }
 
 inline uint32_t SssCorrelator::CalcM1(uint32_t pos)
 {
-    return (LTESyncCodeHalfLen - pos + 1); // look at 36211. Table 6.11.2.1-1
+    return (LTESyncCodeHalfLen - pos + 1)%LTESyncCodeHalfLen; // look at 36211. Table 6.11.2.1-1
 }
 
 }

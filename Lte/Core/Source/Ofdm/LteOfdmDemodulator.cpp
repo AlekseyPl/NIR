@@ -138,7 +138,6 @@ void LteOfdmDemod::PhaseCorrect(Complex16* data, uint32_t CPType, uint32_t step 
 		CPbuf[0].resize(CPType);
 		CPbuf[1].resize(CPType);
 		Math::ConvertShortToFloat(data-CPType, CPbuf[0].data(), (CPType), step, 1);
-
 		Math::ConvertShortToFloat(data + LTEFFTLen_20_MHz - CPType, CPbuf[1].data(), CPType, step, 1);
 
 		for (int i = 0 ; i < CPType;i++){

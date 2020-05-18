@@ -28,8 +28,9 @@ public:
 	void Correlate(const ComplexFloat* signal, uint32_t nid2 = SyncCode::PSS_COUNT );
 	void CorrelateThin(const ComplexFloat* signal, float* absCorr, uint32_t nid2, uint32_t gap );
 
-	const PssRes GetCorrMaxPos(uint32_t nid2);
+    const PssRes GetCorrMaxPos(uint32_t& resNid2);
 
+    void ClearCorr(const uint32_t& resNid2, const uint32_t& pos, int32_t deltaPos);
 private:
 	const ComplexFloat zero;
 	std::shared_ptr<Math::FftSP> fft;
@@ -58,6 +59,7 @@ private:
 
 	inline void PrepareSigHalfZero(const ComplexFloat* sig, uint32_t count);
 	inline void ClearSlice(std::vector<ComplexFloat>& slice);
+
 
 };
 
