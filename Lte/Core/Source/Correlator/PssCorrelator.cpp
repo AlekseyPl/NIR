@@ -31,23 +31,29 @@ PssCorrelator::PssCorrelator(uint32_t corrSize):
 	sigAmps.resize(corrSize + SyncCode::FFTLEN);
 }
 
-const PssCorrelator::PssRes PssCorrelator::GetCorrMaxPos(uint32_t& resNid2)
-{
-    PssRes res;
+//const PssCorrelator::PssRes PssCorrelator::GetCorrMaxPos(uint32_t& resNid2)
+//{
+//    PssRes res;
 
-    float pssMax = 0;
-    for( uint32_t nid2 = 0 ; nid2 < SyncCode::PSS_COUNT; ++nid2 ) {
-        auto maxptr = max_element( absCorr.at(nid2).begin(), absCorr.at(nid2).end() );
-        if( *maxptr > pssMax ) {
-            res.val = *maxptr;
-            resNid2 = nid2;
-            res.pos = std::distance(absCorr.at(nid2).begin(), maxptr);
-        }
-    }
+//    float pssMax = 0;
+//    for( uint32_t nid2 = 0 ; nid2 < SyncCode::PSS_COUNT; ++nid2 ) {
+//        auto maxptr = max_element( absCorr.at(nid2).begin(), absCorr.at(nid2).end() );
+//        if( *maxptr > pssMax ) {
+//            res.val = *maxptr;
+//            resNid2 = nid2;
+//            res.pos = std::distance(absCorr.at(nid2).begin(), maxptr);
+//        }
+//    }
 
 
-	return res;
+//	return res;
+//}
+
+const std::array<std::vector<float>, SyncCode::PSS_COUNT>& PssCorrelator::GetCorrRes() {
+
+    return absCorr;
 }
+
 void PssCorrelator::ClearCorr(const uint32_t &resNid2,const uint32_t &pos, int32_t deltaPos)
 {
     int32_t startPos = pos - deltaPos;

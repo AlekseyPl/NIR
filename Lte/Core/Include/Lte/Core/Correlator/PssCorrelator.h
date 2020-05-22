@@ -1,7 +1,7 @@
 #ifndef Lte_PssCorrelator_H_
 #define Lte_PssCorrelator_H_
 
-#include "Correlator/SyncCode.h"
+#include "SyncCode.h"
 #include <Math/Complex.h>
 
 #include <stdint.h>
@@ -18,8 +18,8 @@ class PssCorrelator {
 public:
 
 	struct PssRes {
-		uint32_t pos;
-		float val;
+        uint32_t pos = 0;
+        float val = 0;
 	};
 
 	explicit PssCorrelator(uint32_t corrSize);
@@ -28,7 +28,9 @@ public:
 	void Correlate(const ComplexFloat* signal, uint32_t nid2 = SyncCode::PSS_COUNT );
 	void CorrelateThin(const ComplexFloat* signal, float* absCorr, uint32_t nid2, uint32_t gap );
 
-    const PssRes GetCorrMaxPos(uint32_t& resNid2);
+//    const PssRes GetCorrMaxPos(uint32_t& resNid2);
+
+    const std::array<std::vector<float>, SyncCode::PSS_COUNT>& GetCorrRes();
 
     void ClearCorr(const uint32_t& resNid2, const uint32_t& pos, int32_t deltaPos);
 private:

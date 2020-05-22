@@ -12,6 +12,7 @@
 #include "Lte/Core/Support/LteDemConst.h"
 #include "Lte/Core/Support/LteTypes.h"
 #include "Lte/Core/Support/CellInfo.h"
+#include "PssCorrelator.h"
 #include <stdint.h>
 #include <memory>
 #include <array>
@@ -25,11 +26,11 @@ namespace Lte {
 class SssCorrelator;
 class SssCorrelatorSlow;
 class PssCorrelator;
-class Filter;
+class
+        Filter;
 
-class LteCorrelator {
-public:
-
+        class LteCorrelator {
+        public:
 	LteCorrelator();
 	~LteCorrelator( );
 
@@ -55,10 +56,21 @@ private:
 
 	float               threshold;
 
+    struct nid2Count
+    {
+       int cnt0;
+       int cnt1;
+       int cnt2;
+    };
+
+
+    nid2Count nid2Cond;
+
 	uint32_t pssPos;
 	uint32_t framePos;
 	uint32_t nCellId;
 	uint32_t decimFactor;
+    uint32_t maxCorrCntr;
 
 	uint32_t rdmGap;
 	uint32_t rdmGapDiv16;
@@ -77,11 +89,19 @@ private:
 	std::shared_ptr<Filter>		filter;
 
 	System::DebugInfo&		debug;
+    enum switchNids{
+        nid0Ch,
+        nid1Ch,
+        nid2Ch
+    };
 
 	void CalcSyncCorr( const ComplexFloat* data );
 	void CalcSyncCorr( const ComplexFloat* data, const CellInfo& cellInfo );
 
 	void SetRdmCorr( uint32_t pssPos, uint32_t nid2 );
+    const PssCorrelator::PssRes FindCorrMax(uint32_t &resNid2, bool &findRes);
+    void SetCondition(int setNid2);
+    bool CheckCondition(int checkNid2);
 
 	inline uint32_t GetResNid( uint32_t nid1, uint32_t nid2 )
 	{
